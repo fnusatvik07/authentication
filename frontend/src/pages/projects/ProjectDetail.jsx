@@ -35,29 +35,29 @@ export default function ProjectDetail() {
 
       {/* Hero banner */}
       <div className={`pt-14 bg-gradient-to-br ${gradients[project.difficultyColor]} text-white`}>
-        <div className="max-w-6xl mx-auto px-8 md:px-12 py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 md:px-12 py-12">
           <Link to="/projects" className="text-white/60 hover:text-white text-sm flex items-center gap-1 mb-4">
             <ArrowLeft size={14} /> All Projects
           </Link>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="flex items-center gap-4 mb-3">
-              <span className="text-6xl font-bold font-mono opacity-20">{String(idx + 1).padStart(2, '0')}</span>
+            <div className="flex items-center gap-3 sm:gap-4 mb-3">
+              <span className="text-4xl sm:text-6xl font-bold font-mono opacity-20">{String(idx + 1).padStart(2, '0')}</span>
               <div>
-                <h1 className="text-4xl font-bold">{project.title}</h1>
-                <div className="flex items-center gap-3 mt-2 text-white/80 text-sm">
-                  <span className="flex items-center gap-1"><FlaskConical size={14} /> {project.tests} tests passing</span>
-                  <span>·</span>
+                <h1 className="text-2xl sm:text-4xl font-bold">{project.title}</h1>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 text-white/80 text-xs sm:text-sm">
+                  <span className="flex items-center gap-1"><FlaskConical size={14} /> {project.tests} tests</span>
+                  <span className="hidden sm:inline">·</span>
                   <span className="flex items-center gap-1"><Server size={14} /> {project.stack.join(' + ')}</span>
                 </div>
               </div>
             </div>
-            <p className="text-white/80 text-lg max-w-3xl mt-4 leading-relaxed">{project.description}</p>
+            <p className="text-white/80 text-sm sm:text-lg max-w-3xl mt-3 sm:mt-4 leading-relaxed">{project.description}</p>
           </motion.div>
         </div>
       </div>
 
       {/* Full walkthrough content */}
-      <div className="max-w-6xl mx-auto px-8 md:px-12 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 md:px-12 py-8">
         <Suspense fallback={<div className="py-20 text-center text-[var(--color-text-muted)]">Loading walkthrough...</div>}>
           {Walkthrough && <Walkthrough />}
         </Suspense>

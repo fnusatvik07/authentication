@@ -60,8 +60,8 @@ export function InfoBox({ type = 'info', title, children }) {
 
 export function ComparisonTable({ headers, rows }) {
   return (
-    <div className="my-5 rounded-xl border border-[var(--color-border)] overflow-hidden">
-      <table className="w-full text-sm">
+    <div className="my-5 rounded-xl border border-[var(--color-border)] overflow-x-auto">
+      <table className="w-full text-sm min-w-[500px]">
         <thead>
           <tr className="bg-[var(--color-surface2)]">
             {headers.map((h, i) => (

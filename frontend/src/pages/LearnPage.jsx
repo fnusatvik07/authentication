@@ -117,7 +117,7 @@ export default function LearnPage() {
 
       {/* Content */}
       <main className="flex-1 min-w-0">
-        <div className="px-8 md:px-12 lg:px-16 py-10 max-w-none">
+        <div className="px-4 sm:px-8 md:px-12 lg:px-16 py-6 sm:py-10 max-w-none">
           <Suspense fallback={<div className="text-[var(--color-text-muted)] py-20 text-center">Loading chapter...</div>}>
             {activeChapter && <activeChapter.component />}
           </Suspense>

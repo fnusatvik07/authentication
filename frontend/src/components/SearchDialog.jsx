@@ -94,7 +94,7 @@ export default function SearchDialog() {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/40 z-50 flex items-start justify-center pt-[15vh]" onClick={() => setOpen(false)}>
+      <div className="fixed inset-0 bg-black/40 z-50 flex items-start justify-center pt-[10vh] sm:pt-[15vh] px-4" onClick={() => setOpen(false)}>
         <div className="w-full max-w-lg bg-[var(--color-bg)] rounded-2xl shadow-2xl border border-[var(--color-border)] overflow-hidden" onClick={e => e.stopPropagation()}>
           {/* Input */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--color-border)]">

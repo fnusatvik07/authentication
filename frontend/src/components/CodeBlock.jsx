@@ -25,8 +25,9 @@ export default function CodeBlock({ code, language = 'python', title }) {
       <SyntaxHighlighter
         language={language}
         style={oneLight}
-        customStyle={{ margin: 0, padding: '16px', background: '#fafbfc', fontSize: '13px', lineHeight: '1.6' }}
+        customStyle={{ margin: 0, padding: '12px', background: '#fafbfc', fontSize: '12px', lineHeight: '1.6', overflowX: 'auto' }}
         showLineNumbers
+        wrapLongLines={false}
       >
         {code}
       </SyntaxHighlighter>

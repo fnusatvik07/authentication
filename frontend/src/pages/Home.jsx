@@ -28,7 +28,7 @@ export default function Home() {
           </motion.div>
 
           <motion.h1
-            className="text-5xl md:text-7xl font-extrabold tracking-tight text-[var(--color-text)] mb-5 leading-[1.1]"
+            className="text-3xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-[var(--color-text)] mb-5 leading-[1.1]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.6 }}
@@ -41,7 +41,7 @@ export default function Home() {
           </motion.h1>
 
           <motion.p
-            className="text-lg md:text-xl text-[var(--color-text-muted)] max-w-2xl mx-auto mb-10 leading-relaxed"
+            className="text-base sm:text-lg md:text-xl text-[var(--color-text-muted)] max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -58,7 +58,7 @@ export default function Home() {
           >
             <Link
               to="/learn"
-              className="px-7 py-3.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-lg shadow-indigo-200"
+              className="px-5 sm:px-7 py-3 sm:py-3.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-lg shadow-indigo-200 text-sm sm:text-base"
             >
               <BookOpen size={18} />
               Start Learning
@@ -66,7 +66,7 @@ export default function Home() {
             </Link>
             <Link
               to="/projects"
-              className="px-7 py-3.5 bg-white border border-[var(--color-border)] text-[var(--color-text)] font-semibold rounded-xl hover:border-indigo-300 hover:bg-indigo-50/50 transition-all flex items-center gap-2"
+              className="px-5 sm:px-7 py-3 sm:py-3.5 bg-white border border-[var(--color-border)] text-[var(--color-text)] font-semibold rounded-xl hover:border-indigo-300 hover:bg-indigo-50/50 transition-all flex items-center gap-2 text-sm sm:text-base"
             >
               <FolderCode size={18} />
               View Projects
@@ -185,7 +185,7 @@ export default function Home() {
         <h2 className="text-3xl font-bold text-center mb-3">Security Feature Progression</h2>
         <p className="text-[var(--color-text-muted)] text-center mb-10">Each project adds more security layers</p>
 
-        <div className="grid grid-cols-3 gap-6 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-sm">
           {[
             { title: 'Project 1', subtitle: 'Basic', color: 'border-emerald-200 bg-emerald-50/30', features: ['bcrypt hashing', 'HS256 JWT', 'Account lockout'] },
             { title: 'Project 2', subtitle: 'Medium', color: 'border-orange-200 bg-orange-50/30', features: ['+ RS256 asymmetric', '+ Password reset', '+ Refresh rotation', '+ Public key endpoint'] },

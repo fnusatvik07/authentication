@@ -185,24 +185,26 @@ export default function APIPlayground({ baseUrl = 'http://localhost:8000', class
       {/* Request builder */}
       <div className="p-4 space-y-3">
         {/* Method + URL */}
-        <div className="flex gap-2">
-          <select value={method} onChange={e => setMethod(e.target.value)}
-            className="px-3 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg text-sm font-semibold focus:outline-none focus:border-[var(--color-primary)]">
-            {['GET', 'POST', 'PUT', 'DELETE'].map(m => <option key={m}>{m}</option>)}
-          </select>
-          <input value={url} onChange={e => setUrl(e.target.value)}
-            className="flex-1 px-3 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg text-sm font-mono focus:outline-none focus:border-[var(--color-primary)]"
-            placeholder="/api/endpoint" />
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex gap-2">
+            <select value={method} onChange={e => setMethod(e.target.value)}
+              className="px-3 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg text-sm font-semibold focus:outline-none focus:border-[var(--color-primary)]">
+              {['GET', 'POST', 'PUT', 'DELETE'].map(m => <option key={m}>{m}</option>)}
+            </select>
+            <input value={url} onChange={e => setUrl(e.target.value)}
+              className="flex-1 min-w-0 px-3 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg text-sm font-mono focus:outline-none focus:border-[var(--color-primary)]"
+              placeholder="/api/endpoint" />
+          </div>
           <button onClick={sendRequest} disabled={loading}
-            className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-semibold hover:bg-[var(--color-primary-light)] transition-colors flex items-center gap-1.5 disabled:opacity-50">
+            className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-semibold hover:bg-[var(--color-primary-light)] transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50">
             {loading ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} />}
             Send
           </button>
         </div>
 
         {/* Auth toggle + token */}
-        <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-xs text-[var(--color-text-muted)] cursor-pointer">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+          <label className="flex items-center gap-2 text-xs text-[var(--color-text-muted)] cursor-pointer flex-shrink-0">
             <input type="checkbox" checked={useAuth} onChange={e => setUseAuth(e.target.checked)}
               className="rounded border-[var(--color-border)]" />
             Include Authorization header
