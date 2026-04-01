@@ -9,14 +9,14 @@ export default function Chapter4() {
   return (<>
     <H icon={Server} title="API Design Fundamentals" badge="Chapter 4 · Foundation" color="green" />
 
-    <P>An API (Application Programming Interface) is the contract between your frontend and backend. When the frontend needs to log in a user, it doesn't call a Python function directly — it makes an HTTP request to a specific URL with a specific format, and gets back a structured response.</P>
+    <P>An API (Application Programming Interface) is the contract between your frontend and backend. When the frontend needs to log in a user, it doesn't call a Python function directly - it makes an HTTP request to a specific URL with a specific format, and gets back a structured response.</P>
 
     <P>Before we build auth, we need to understand how to design these endpoints. Good API design makes auth predictable, debuggable, and secure.</P>
 
     <Section title="REST Conventions for Auth">
       <P>REST (Representational State Transfer) is a set of conventions for designing APIs. Here's how auth endpoints typically look across all three of our projects:</P>
 
-      <MermaidDiagram title="Auth API structure — our endpoint map" chart={`flowchart TD
+      <MermaidDiagram title="Auth API structure - our endpoint map" chart={`flowchart TD
     A["POST /api/register"] -->|"Create user<br/>Hash password"| B["201: {id, username, role}"]
     C["POST /api/login"] -->|"Verify password<br/>Create JWT"| D["200: {access_token, refresh_token}"]
     E["POST /api/refresh"] -->|"Rotate tokens<br/>Revoke old"| F["200: {new_access, new_refresh}"]
@@ -32,7 +32,7 @@ export default function Chapter4() {
     <Section title="Request & Response Bodies">
       <P>APIs communicate in JSON (JavaScript Object Notation). Here's exactly what the data looks like going in and coming out:</P>
 
-      <CodeBlock title="Registration — what the frontend sends and receives" language="json" code={`// POST /api/register — Request body
+      <CodeBlock title="Registration - what the frontend sends and receives" language="json" code={`// POST /api/register - Request body
 {
   "username": "alice",
   "email": "alice@example.com",
@@ -48,7 +48,7 @@ export default function Chapter4() {
   "role": "user"
 }`} />
 
-      <CodeBlock title="Login — returns the JWT token pair" language="json" code={`// POST /api/login — Request body
+      <CodeBlock title="Login - returns the JWT token pair" language="json" code={`// POST /api/login - Request body
 {
   "username": "alice",
   "password": "MySecureP@ss123"
@@ -67,10 +67,10 @@ export default function Chapter4() {
     <Section title="Input Validation with Pydantic">
       <P>FastAPI uses Pydantic models to validate incoming data automatically. If a required field is missing or the wrong type, the client gets a 422 error before your code even runs:</P>
 
-      <CodeBlock title="models.py — Request validation" language="python" code={`from pydantic import BaseModel
+      <CodeBlock title="models.py - Request validation" language="python" code={`from pydantic import BaseModel
 
 class UserRegister(BaseModel):
-    username: str      # Required — 422 if missing
+    username: str      # Required - 422 if missing
     email: str         # Required
     password: str      # Required
 
@@ -85,7 +85,7 @@ class Token(BaseModel):
 # FastAPI validates automatically:
 @app.post("/api/register", response_model=UserResponse)
 def register(user: UserRegister):
-    # 'user' is already validated — safe to use
+    # 'user' is already validated - safe to use
     # If username was missing, client already got a 422
     ...`} />
 
@@ -94,7 +94,7 @@ def register(user: UserRegister):
       </InfoBox>
     </Section>
 
-    <Section title="Try It — API Playground">
+    <Section title="Try It - API Playground">
       <P>If you have Project 1's backend running (<code className="bg-[var(--color-surface2)] px-1 rounded text-[13px]">cd project-1-basic/backend && python main.py</code>), you can send real requests right here. Try registering a user, then logging in. The token will be auto-captured so you can test protected endpoints.</P>
       <APIPlayground className="my-6" />
     </Section>

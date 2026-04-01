@@ -156,9 +156,9 @@ export default function Home() {
           <div className="space-y-4">
             {[
               { step: '01', title: 'Read the Docs', desc: 'Password hashing → JWT → RS256 → RBAC → Security → RAG Auth', link: '/learn', gradient: 'from-emerald-500 to-emerald-600' },
-              { step: '02', title: 'Project 1: Basic JWT', desc: 'Registration, login, protected routes, account lockout — 45 tests', link: '/projects/1', gradient: 'from-indigo-500 to-indigo-600' },
-              { step: '03', title: 'Project 2: RS256 + RBAC', desc: 'Asymmetric JWT, multi-server, refresh rotation, password reset — 58 tests', link: '/projects/2', gradient: 'from-orange-500 to-orange-600' },
-              { step: '04', title: 'Project 3: ReAct RAG Agent', desc: 'Think→Act→Observe loop, tool gating, token blacklisting — 62 tests', link: '/projects/3', gradient: 'from-purple-500 to-purple-600' },
+              { step: '02', title: 'Project 1: Basic JWT', desc: 'Registration, login, protected routes, account lockout - 45 tests', link: '/projects/1', gradient: 'from-indigo-500 to-indigo-600' },
+              { step: '03', title: 'Project 2: RS256 + RBAC', desc: 'Asymmetric JWT, multi-server, refresh rotation, password reset - 58 tests', link: '/projects/2', gradient: 'from-orange-500 to-orange-600' },
+              { step: '04', title: 'Project 3: ReAct RAG Agent', desc: 'Think→Act→Observe loop, tool gating, token blacklisting - 62 tests', link: '/projects/3', gradient: 'from-purple-500 to-purple-600' },
             ].map((item, i) => (
               <motion.div key={item.step} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
                 <Link

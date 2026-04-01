@@ -106,7 +106,7 @@ export default function Quiz({ questions }) {
           correct === total ? 'bg-emerald-50 text-emerald-700' : 'bg-orange-50 text-orange-700'
         }`}>
           {correct === total
-            ? `Perfect score! ${total}/${total} — You've mastered this topic.`
+            ? `Perfect score! ${total}/${total} - You've mastered this topic.`
             : `${correct}/${total} correct. Review the explanations above and try again.`
           }
         </div>

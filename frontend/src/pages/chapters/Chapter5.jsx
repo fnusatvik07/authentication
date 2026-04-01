@@ -10,8 +10,8 @@ export default function Chapter5() {
 
     <P>These two words sound almost identical, and beginners (and even experienced developers) confuse them constantly. But they answer two completely different questions, happen at different times, and fail with different error codes. Getting this distinction right is fundamental.</P>
 
-    <P><strong>Authentication (AuthN)</strong> answers: "Who are you?" — proving identity. It's the bouncer checking your ID at the door.</P>
-    <P><strong>Authorization (AuthZ)</strong> answers: "What can you do?" — checking permissions. It's the VIP list that decides which rooms you can enter once you're inside.</P>
+    <P><strong>Authentication (AuthN)</strong> answers: "Who are you?" - proving identity. It's the bouncer checking your ID at the door.</P>
+    <P><strong>Authorization (AuthZ)</strong> answers: "What can you do?" - checking permissions. It's the VIP list that decides which rooms you can enter once you're inside.</P>
 
     <Section title="The Two-Step Process">
       <P>Every protected request goes through both steps, in order. Authentication happens first. If it fails, we stop immediately (401). Only if authentication succeeds do we check authorization. If that fails, we return 403.</P>
@@ -31,15 +31,15 @@ export default function Chapter5() {
       <P>Let's say Alice (role: user) and Bob (role: admin) both try to access the admin panel:</P>
 
       <ComparisonTable headers={['Scenario', 'Authentication', 'Authorization', 'Result']} rows={[
-        ['No token sent', '❌ Fails — no identity', 'Never reached', '401 Unauthorized'],
-        ['Expired token', '❌ Fails — token expired', 'Never reached', '401 Unauthorized'],
+        ['No token sent', '❌ Fails - no identity', 'Never reached', '401 Unauthorized'],
+        ['Expired token', '❌ Fails - token expired', 'Never reached', '401 Unauthorized'],
         ['Alice (role: user)', '✅ Valid token, identity: alice', '❌ user < admin', '403 Forbidden'],
         ['Bob (role: admin)', '✅ Valid token, identity: bob', '✅ admin ≥ admin', '200 OK'],
       ]} />
     </Section>
 
-    <Section title="In Code — Both Steps Together">
-      <CodeBlock title="FastAPI — authentication then authorization" language="python" code={`from fastapi import Depends, HTTPException
+    <Section title="In Code - Both Steps Together">
+      <CodeBlock title="FastAPI - authentication then authorization" language="python" code={`from fastapi import Depends, HTTPException
 
 # AUTHENTICATION: verify JWT, extract identity
 def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -64,7 +64,7 @@ def admin_panel(user = Depends(require_role("admin"))):
     return {"message": f"Welcome admin {user['sub']}"}`} />
 
       <InfoBox type="warning" title="The most common auth bug">
-        Returning 401 when you should return 403 (or vice versa). This confuses your frontend — a 401 should trigger a token refresh or redirect to login. A 403 should show "access denied." If you mix them up, users get sent to the login page when they're actually logged in but just don't have permission.
+        Returning 401 when you should return 403 (or vice versa). This confuses your frontend - a 401 should trigger a token refresh or redirect to login. A 403 should show "access denied." If you mix them up, users get sent to the login page when they're actually logged in but just don't have permission.
       </InfoBox>
     </Section>
 

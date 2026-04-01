@@ -175,7 +175,7 @@ export default function LearnPage() {
             )
           })()}
 
-          {/* Certificate — shows on last chapter */}
+          {/* Certificate - shows on last chapter */}
           {activeSlug === 'production' && (
             <div className="mt-12">
               <Certificate completedCount={completedCount} total={15} />

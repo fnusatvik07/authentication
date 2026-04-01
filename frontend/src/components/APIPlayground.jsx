@@ -70,7 +70,7 @@ export default function APIPlayground({ baseUrl = 'http://localhost:8000', class
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
   const [presetsOpen, setPresetsOpen] = useState(false)
-  const [useMock, setUseMock] = useState(true) // Default to mock — works without backend
+  const [useMock, setUseMock] = useState(true) // Default to mock - works without backend
 
   const sendRequest = async () => {
     setLoading(true)
@@ -246,7 +246,7 @@ export default function APIPlayground({ baseUrl = 'http://localhost:8000', class
             </div>
           </div>
 
-          {/* Learn callout — the teaching moment */}
+          {/* Learn callout - the teaching moment */}
           {response.data?._learn && (
             <div className="px-4 py-3 bg-indigo-50 border-b border-indigo-100 flex gap-2">
               <Lightbulb size={15} className="text-indigo-500 flex-shrink-0 mt-0.5" />

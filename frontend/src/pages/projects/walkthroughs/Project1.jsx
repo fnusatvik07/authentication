@@ -14,14 +14,14 @@ export default function Project1() {
         <li>How do you "remember" they're logged in for subsequent requests without asking for their password every time?</li>
         <li>How do you prevent someone from brute-forcing passwords by trying thousands of combinations?</li>
       </ol>
-      <P>This project solves all four. By the end, you'll have a working auth system with registration, login, JWT tokens, protected routes, and account lockout — the same patterns used by real production APIs.</P>
+      <P>This project solves all four. By the end, you'll have a working auth system with registration, login, JWT tokens, protected routes, and account lockout - the same patterns used by real production APIs.</P>
     </Section>
 
     {/* ── Architecture ────────────────────────────────── */}
     <Section title="Architecture">
       <P>The system has three layers: a frontend (vanilla HTML/JS), a FastAPI backend, and a SQLite database. The frontend sends requests, the backend handles all auth logic, and the database stores users and their hashed passwords.</P>
 
-      <MermaidDiagram title="Project 1 — System architecture" chart={`sequenceDiagram
+      <MermaidDiagram title="Project 1 - System architecture" chart={`sequenceDiagram
     participant F as 🌐 Frontend<br/>(HTML/JS)
     participant B as 🖥️ FastAPI<br/>(Port 8000)
     participant DB as 🗄️ SQLite<br/>(users.db)
@@ -59,7 +59,7 @@ export default function Project1() {
         ['models.py', 'Pydantic request/response validation', 'UserRegister, UserLogin, Token'],
         ['auth.py', 'Password hashing + JWT logic', 'hash_password(), verify_password(), create_access_token(), get_current_user()'],
         ['main.py', 'API endpoints + account lockout', '/register, /login, /me, /protected'],
-        ['test_project1.py', '45 tests — unit, integration, E2E', 'TestPasswordHashing, TestLoginEndpoint, TestAccountLockout, ...'],
+        ['test_project1.py', '45 tests - unit, integration, E2E', 'TestPasswordHashing, TestLoginEndpoint, TestAccountLockout, ...'],
         ['frontend/index.html', 'Login/register UI + token management', 'Login tab, register tab, profile view'],
       ]} />
     </Section>
@@ -67,9 +67,9 @@ export default function Project1() {
     {/* ── Step-by-Step Walkthrough ────────────────────── */}
     <Section title="Step-by-Step Code Walkthrough">
       <h3 className="text-lg font-semibold mt-8 mb-3 text-[var(--color-text)]">Step 1: Database Schema</h3>
-      <P>First, we define where user data lives. The <code className="bg-[var(--color-surface2)] px-1 rounded text-[13px]">password_hash</code> column stores the bcrypt output — never the plaintext password. The <code className="bg-[var(--color-surface2)] px-1 rounded text-[13px]">failed_login_attempts</code> and <code className="bg-[var(--color-surface2)] px-1 rounded text-[13px]">locked_until</code> columns support account lockout.</P>
+      <P>First, we define where user data lives. The <code className="bg-[var(--color-surface2)] px-1 rounded text-[13px]">password_hash</code> column stores the bcrypt output - never the plaintext password. The <code className="bg-[var(--color-surface2)] px-1 rounded text-[13px]">failed_login_attempts</code> and <code className="bg-[var(--color-surface2)] px-1 rounded text-[13px]">locked_until</code> columns support account lockout.</P>
 
-      <CodeBlock title="database.py — Schema definition" language="python" code={`import sqlite3
+      <CodeBlock title="database.py - Schema definition" language="python" code={`import sqlite3
 from pathlib import Path
 
 DB_PATH = Path(__file__).parent / "users.db"
@@ -96,9 +96,9 @@ def init_db():
     conn.close()`} />
 
       <h3 className="text-lg font-semibold mt-10 mb-3 text-[var(--color-text)]">Step 2: Password Hashing & JWT Utilities</h3>
-      <P>This is the security core. Two functions handle passwords (hash and verify), and two handle JWT tokens (create and decode). The <code className="bg-[var(--color-surface2)] px-1 rounded text-[13px]">get_current_user</code> function is a FastAPI dependency — it automatically extracts the token from the Authorization header, verifies it, and returns the user.</P>
+      <P>This is the security core. Two functions handle passwords (hash and verify), and two handle JWT tokens (create and decode). The <code className="bg-[var(--color-surface2)] px-1 rounded text-[13px]">get_current_user</code> function is a FastAPI dependency - it automatically extracts the token from the Authorization header, verifies it, and returns the user.</P>
 
-      <CodeBlock title="auth.py — The complete auth utilities" language="python" code={`import os
+      <CodeBlock title="auth.py - The complete auth utilities" language="python" code={`import os
 import bcrypt
 import jwt
 from datetime import datetime, timedelta, timezone
@@ -165,7 +165,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
       <h3 className="text-lg font-semibold mt-10 mb-3 text-[var(--color-text)]">Step 3: Registration Endpoint</h3>
       <P>Registration takes a username, email, and password. It checks for duplicates, hashes the password with bcrypt, stores the hash (never the plaintext), and returns the new user profile.</P>
 
-      <CodeBlock title="main.py — Registration" language="python" code={`@app.post("/api/register", response_model=UserResponse, status_code=201)
+      <CodeBlock title="main.py - Registration" language="python" code={`@app.post("/api/register", response_model=UserResponse, status_code=201)
 def register(user: UserRegister):
     conn = get_db()
 
@@ -178,7 +178,7 @@ def register(user: UserRegister):
         conn.close()
         raise HTTPException(400, "Username or email already exists")
 
-    # Hash the password — NEVER store plaintext
+    # Hash the password - NEVER store plaintext
     password_hash = hash_password(user.password)
 
     # Insert user with hashed password
@@ -192,12 +192,12 @@ def register(user: UserRegister):
         (cursor.lastrowid,)
     ).fetchone()
     conn.close()
-    return dict(new_user)  # Returns {id, username, email} — no password!`} />
+    return dict(new_user)  # Returns {id, username, email} - no password!`} />
 
       <h3 className="text-lg font-semibold mt-10 mb-3 text-[var(--color-text)]">Step 4: Login with Account Lockout</h3>
       <P>This is the most complex endpoint. It handles three scenarios: account already locked, wrong password (increment counter, maybe lock), and correct password (reset counter, issue JWT).</P>
 
-      <CodeBlock title="main.py — Login with brute-force protection" language="python" code={`MAX_FAILED_ATTEMPTS = 5
+      <CodeBlock title="main.py - Login with brute-force protection" language="python" code={`MAX_FAILED_ATTEMPTS = 5
 LOCKOUT_MINUTES = 15
 
 @app.post("/api/login", response_model=Token)
@@ -220,7 +220,7 @@ def login(user: UserLogin):
             conn.close()
             raise HTTPException(423, "Account locked. Try again later.")
         else:
-            # Lock expired — reset
+            # Lock expired - reset
             conn.execute("UPDATE users SET failed_login_attempts=0, locked_until=NULL WHERE id=?",
                          (db_user["id"],))
             conn.commit()
@@ -240,7 +240,7 @@ def login(user: UserLogin):
         conn.close()
         raise HTTPException(401, "Invalid username or password")
 
-    # ── Success — reset counter, issue JWT ──
+    # ── Success - reset counter, issue JWT ──
     conn.execute("UPDATE users SET failed_login_attempts=0, locked_until=NULL WHERE id=?",
                  (db_user["id"],))
     conn.commit()
@@ -251,9 +251,9 @@ def login(user: UserLogin):
       <h3 className="text-lg font-semibold mt-10 mb-3 text-[var(--color-text)]">Step 5: Protected Endpoints</h3>
       <P>Any endpoint that needs authentication just adds <code className="bg-[var(--color-surface2)] px-1 rounded text-[13px]">Depends(get_current_user)</code>. FastAPI automatically extracts the Bearer token, verifies it, and passes the user data to your function. If the token is missing or invalid, the user gets a 401 before your code runs.</P>
 
-      <CodeBlock title="main.py — Protected routes" language="python" code={`@app.get("/api/me", response_model=UserResponse)
+      <CodeBlock title="main.py - Protected routes" language="python" code={`@app.get("/api/me", response_model=UserResponse)
 def get_me(current_user: dict = Depends(get_current_user)):
-    """The 'current_user' is already verified — JWT was valid."""
+    """The 'current_user' is already verified - JWT was valid."""
     return current_user
 
 @app.get("/api/protected")
@@ -272,7 +272,7 @@ def protected_route(current_user: dict = Depends(get_current_user)):
     </Section>
 
     {/* ── Testing ────────────────────────────────── */}
-    <Section title="Testing — 45 Tests">
+    <Section title="Testing - 45 Tests">
       <P>The test suite covers every scenario: happy paths, edge cases, and security boundaries. Here are the test categories:</P>
 
       <ComparisonTable headers={['Category', 'Tests', 'What they verify']} rows={[
@@ -319,8 +319,8 @@ class TestEdgeCases:
     <Section title="What You've Learned">
       <div className="grid md:grid-cols-2 gap-4">
         {[
-          { num: '01', text: 'Passwords are NEVER stored — only the bcrypt hash. Each hash includes its own random salt.' },
-          { num: '02', text: 'JWT tokens are self-contained — the server doesn\'t store sessions. The token itself proves identity.' },
+          { num: '01', text: 'Passwords are NEVER stored - only the bcrypt hash. Each hash includes its own random salt.' },
+          { num: '02', text: 'JWT tokens are self-contained - the server doesn\'t store sessions. The token itself proves identity.' },
           { num: '03', text: 'The Depends(get_current_user) pattern lets you protect any endpoint with one line of code.' },
           { num: '04', text: 'Account lockout tracks failed_login_attempts in the database and locks after 5 failures for 15 minutes.' },
           { num: '05', text: 'Tests should cover not just happy paths, but edge cases: expired tokens, tampered tokens, locked accounts.' },
@@ -340,13 +340,13 @@ class TestEdgeCases:
         ['Registration works but login fails', '401 on login with correct password', 'Password stored as plaintext, not bcrypt hash', 'Ensure hash_password() is called before INSERT, not the raw password'],
         ['Token works once then fails', 'First request OK, second returns 401', 'Creating a new token on every request instead of reusing the login token', 'Store the token from /login response and reuse it'],
         ['Account locked but password is correct', '423 Locked response', 'Previous failed attempts triggered lockout', 'Wait 15 minutes, or reset in DB: UPDATE users SET failed_login_attempts=0, locked_until=NULL'],
-        ['"Invalid token" after server restart', '401 even with a recently-issued token', 'SECRET_KEY changed (using random default)', 'Set a fixed SECRET_KEY in .env — random defaults change on restart'],
-        ['bcrypt error on Python 3.13', 'ValueError or AttributeError from passlib', 'Using passlib instead of bcrypt directly', 'We use bcrypt directly (not passlib) to avoid this — check your imports'],
+        ['"Invalid token" after server restart', '401 even with a recently-issued token', 'SECRET_KEY changed (using random default)', 'Set a fixed SECRET_KEY in .env - random defaults change on restart'],
+        ['bcrypt error on Python 3.13', 'ValueError or AttributeError from passlib', 'Using passlib instead of bcrypt directly', 'We use bcrypt directly (not passlib) to avoid this - check your imports'],
       ]} />
     </Section>
 
     <InfoBox type="tip" title="What's missing?">
-      This project uses <strong>HS256</strong> (symmetric JWT) — the same secret signs and verifies. If you deploy multiple servers, they'd all need the same secret. Project 2 solves this with RS256 (asymmetric). This project also has no way to revoke tokens or reset passwords — those come in Projects 2 and 3.
+      This project uses <strong>HS256</strong> (symmetric JWT) - the same secret signs and verifies. If you deploy multiple servers, they'd all need the same secret. Project 2 solves this with RS256 (asymmetric). This project also has no way to revoke tokens or reset passwords - those come in Projects 2 and 3.
     </InfoBox>
   </>)
 }

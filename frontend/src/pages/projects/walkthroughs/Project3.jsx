@@ -5,13 +5,13 @@ import MermaidDiagram from '../../../components/MermaidDiagram'
 export default function Project3() {
   return (<>
     <Section title="The Problem">
-      <P>You're building an AI assistant that can search across multiple knowledge bases — public docs, internal wikis, admin configurations, even a live database. Different users should see different information. An intern shouldn't see salary bands. A guest shouldn't see the internal roadmap. But the LLM doesn't understand access control — it will happily use any data you give it.</P>
+      <P>You're building an AI assistant that can search across multiple knowledge bases - public docs, internal wikis, admin configurations, even a live database. Different users should see different information. An intern shouldn't see salary bands. A guest shouldn't see the internal roadmap. But the LLM doesn't understand access control - it will happily use any data you give it.</P>
 
       <P>This project solves three hard problems at once:</P>
       <ol className="list-decimal list-inside space-y-2 text-[var(--color-text-secondary)] ml-4 mb-6">
         <li><strong>How do you gate AI tool access by user role?</strong> Each search tool (FAISS, ChromaDB, SQLite) requires a minimum role. The agent only sees tools the user is authorized for.</li>
         <li><strong>How do you make the agent reason step-by-step?</strong> Instead of calling all tools at once, the ReAct pattern (Think → Act → Observe) lets the agent decide what information it needs, call one tool at a time, read the results, and decide whether to call another.</li>
-        <li><strong>How do you revoke a JWT token instantly?</strong> JTI-based blacklisting — each token has a unique ID, and logout adds it to a blacklist checked on every request.</li>
+        <li><strong>How do you revoke a JWT token instantly?</strong> JTI-based blacklisting - each token has a unique ID, and logout adds it to a blacklist checked on every request.</li>
       </ol>
     </Section>
 
@@ -60,12 +60,12 @@ export default function Project3() {
       ]} />
     </Section>
 
-    <Section title="The ReAct Agent — Think → Act → Observe">
-      <P>Most "AI agent" tutorials just call all tools at once and dump results into a prompt. That's not agentic — it's batch processing. A real agent <strong>reasons about what information it needs</strong>, makes a decision about which tool to call, reads the results, and then decides what to do next.</P>
+    <Section title="The ReAct Agent - Think → Act → Observe">
+      <P>Most "AI agent" tutorials just call all tools at once and dump results into a prompt. That's not agentic - it's batch processing. A real agent <strong>reasons about what information it needs</strong>, makes a decision about which tool to call, reads the results, and then decides what to do next.</P>
 
       <P>Our agent follows the ReAct pattern (Yao et al., 2022). On each step, it outputs one of two formats:</P>
 
-      <CodeBlock title="LLM output format — action or answer" language="text" code={`# Format A: Agent needs more information
+      <CodeBlock title="LLM output format - action or answer" language="text" code={`# Format A: Agent needs more information
 Thought: I need to find infrastructure cost data. The user is an admin,
          so I can use admin_search.
 Action: admin_search
@@ -93,7 +93,7 @@ Answer: Based on internal records, your total monthly AWS spend is $50,000,
     style S4 fill:#f5f3ff,stroke:#7c3aed
     style S5 fill:#fffbeb,stroke:#d97706`} />
 
-      <CodeBlock title="agent.py — The ReAct loop" language="python" code={`MAX_STEPS = 5
+      <CodeBlock title="agent.py - The ReAct loop" language="python" code={`MAX_STEPS = 5
 
 def run_agent(query, user_role, username, conversation_history=None):
     # ── RBAC: Filter tools BEFORE the loop ──
@@ -141,7 +141,7 @@ def run_agent(query, user_role, username, conversation_history=None):
     </Section>
 
     <Section title="Tool Gating by Role">
-      <P>Each tool requires a minimum role. The agent literally cannot see tools above the user's role level — they're filtered out before the loop starts. Even if the LLM hallucinated a tool name, the RBAC check inside the loop would reject it.</P>
+      <P>Each tool requires a minimum role. The agent literally cannot see tools above the user's role level - they're filtered out before the loop starts. Even if the LLM hallucinated a tool name, the RBAC check inside the loop would reject it.</P>
 
       <ComparisonTable headers={['Tool', 'Vector Store', 'Min Role', 'What it searches', 'guest', 'user', 'admin', 's_admin']} rows={[
         ['public_search', 'FAISS', 'guest', 'Product info, FAQs, API docs, pricing', '✅', '✅', '✅', '✅'],
@@ -150,7 +150,7 @@ def run_agent(query, user_role, username, conversation_history=None):
         ['database_query', 'SQLite', 'super_admin', 'Direct SQL on users table (read-only, keyword-blocked)', '❌', '❌', '❌', '✅'],
       ]} />
 
-      <CodeBlock title="auth.py — Tool permission mapping" language="python" code={`TOOL_PERMISSIONS = {
+      <CodeBlock title="auth.py - Tool permission mapping" language="python" code={`TOOL_PERMISSIONS = {
     "public_search": "guest",        # FAISS index
     "internal_search": "user",       # ChromaDB: internal_docs
     "admin_search": "admin",         # ChromaDB: admin_docs
@@ -170,8 +170,8 @@ def get_available_tools(user_role: str) -> list[str]:
 # get_available_tools("guest") → ["public_search"]`} />
     </Section>
 
-    <Section title="Token Blacklisting — Instant Revocation">
-      <P>JWTs are stateless — the server doesn't track active tokens. This is great for scalability but terrible for logout. If a user logs out, their token is still valid until it expires. The JTI (JWT ID) pattern solves this.</P>
+    <Section title="Token Blacklisting - Instant Revocation">
+      <P>JWTs are stateless - the server doesn't track active tokens. This is great for scalability but terrible for logout. If a user logs out, their token is still valid until it expires. The JTI (JWT ID) pattern solves this.</P>
 
       <P>Every token gets a unique UUID in its <code className="bg-[var(--color-surface2)] px-1 rounded text-[13px]">jti</code> claim. On logout, we add that JTI to a blacklist table. On <em>every request</em>, we check if the token's JTI is in the blacklist.</P>
 
@@ -183,10 +183,10 @@ def get_available_tools(user_role: str) -> list[str]:
     Note over C,BL: Normal request (token not blacklisted)
     C->>S: GET /api/me + Bearer token (jti: "abc-123")
     S->>BL: SELECT * FROM blacklist WHERE jti="abc-123"
-    BL-->>S: (no rows — not blacklisted)
-    S-->>C: 200 OK — access granted
+    BL-->>S: (no rows - not blacklisted)
+    S-->>C: 200 OK - access granted
 
-    Note over C,BL: Logout — blacklist the token
+    Note over C,BL: Logout - blacklist the token
     C->>S: POST /logout + Bearer token (jti: "abc-123")
     S->>BL: INSERT INTO blacklist (jti: "abc-123", expires: ...)
     S-->>C: 200 "Token revoked"
@@ -194,10 +194,10 @@ def get_available_tools(user_role: str) -> list[str]:
     Note over C,BL: Same token after logout
     C->>S: GET /api/me + Bearer token (jti: "abc-123")
     S->>BL: SELECT * FROM blacklist WHERE jti="abc-123"
-    BL-->>S: (found! — blacklisted)
+    BL-->>S: (found! - blacklisted)
     S-->>C: 401 "Token has been revoked"`} />
 
-      <CodeBlock title="auth.py — JTI blacklisting" language="python" code={`import uuid
+      <CodeBlock title="auth.py - JTI blacklisting" language="python" code={`import uuid
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
@@ -226,14 +226,14 @@ def is_token_blacklisted(jti: str) -> bool:
 @app.post("/api/logout")
 def logout(current_user = Depends(get_current_user)):
     blacklist_token(current_user["jti"], current_user["exp"])
-    return {"message": "Logged out — token revoked"}
+    return {"message": "Logged out - token revoked"}
     # From this moment, this specific token is rejected everywhere`} />
     </Section>
 
     <Section title="SQL Injection Protection">
-      <P>The <code className="bg-[var(--color-surface2)] px-1 rounded text-[13px]">database_query</code> tool lets super_admins ask natural language questions about the database, which the LLM converts to SQL. This is powerful but dangerous — we must prevent SQL injection.</P>
+      <P>The <code className="bg-[var(--color-surface2)] px-1 rounded text-[13px]">database_query</code> tool lets super_admins ask natural language questions about the database, which the LLM converts to SQL. This is powerful but dangerous - we must prevent SQL injection.</P>
 
-      <CodeBlock title="tools.py — SQL safety checks" language="python" code={`def database_query(query: str) -> list[dict]:
+      <CodeBlock title="tools.py - SQL safety checks" language="python" code={`def database_query(query: str) -> list[dict]:
     """Execute read-only SQL. Super_admin only."""
     normalized = query.strip().upper()
 
@@ -257,7 +257,7 @@ def logout(current_user = Depends(get_current_user)):
     return results[:20]  # Limit to 20 rows`} />
     </Section>
 
-    <Section title="Testing — 62 Tests">
+    <Section title="Testing - 62 Tests">
       <ComparisonTable headers={['Category', 'Tests', 'What they verify']} rows={[
         ['Tool Permissions', '6', 'Each role gets correct tools, unknown role defaults, permissions map valid'],
         ['Role Hierarchy', '3', 'Ordering, higher-passes-lower, lower-denied'],
@@ -278,13 +278,13 @@ def logout(current_user = Depends(get_current_user)):
       <div className="grid md:grid-cols-2 gap-4">
         {[
           { num: '01', text: 'ReAct = Reason + Act. The agent thinks step-by-step, calling one tool at a time. It\'s not just "dump everything into the prompt."' },
-          { num: '02', text: 'RBAC tool gating: the agent NEVER sees unauthorized tools. Double enforcement — before the loop AND inside it.' },
+          { num: '02', text: 'RBAC tool gating: the agent NEVER sees unauthorized tools. Double enforcement - before the loop AND inside it.' },
           { num: '03', text: 'JTI blacklisting solves "JWT can\'t be revoked." Each token has a unique UUID. Logout adds it to a blacklist. Every request checks.' },
           { num: '04', text: 'Separate vector collections per access level = pre-retrieval filtering. The LLM never even sees unauthorized documents.' },
           { num: '05', text: 'SQL injection protection requires keyword blocking + semicolon blocking + SELECT-only validation. Defense in depth.' },
           { num: '06', text: 'Audit logging records every query with user, role, tools used, and step count. Essential for compliance and debugging.' },
           { num: '07', text: 'Conversation history (last 6 messages) enables follow-up questions: "Tell me more about that" works because the agent has context.' },
-          { num: '08', text: 'The frontend shows the ReAct trace — users can expand each step to see exactly how the agent reasoned. Transparency builds trust.' },
+          { num: '08', text: 'The frontend shows the ReAct trace - users can expand each step to see exactly how the agent reasoned. Transparency builds trust.' },
         ].map(item => (
           <div key={item.num} className="flex gap-3 p-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl">
             <span className="text-[var(--color-primary)] font-bold font-mono text-sm flex-shrink-0">{item.num}</span>
@@ -298,11 +298,11 @@ def logout(current_user = Depends(get_current_user)):
       <ComparisonTable headers={['Problem', 'Symptom', 'Cause', 'Fix']} rows={[
         ['Chat returns fallback (no LLM)', 'Response starts with "[Fallback mode]"', 'OPENAI_API_KEY not set in .env', 'Add OPENAI_API_KEY=sk-... to your .env file and restart'],
         ['Vector DB not found', 'Error about missing FAISS index', 'setup_vectordb.py not run', 'Run: python -m vector_db.setup_vectordb (one-time setup)'],
-        ['Agent uses wrong tools', 'Guest user getting admin results', 'Tool gating not working', 'Check get_tools_for_role() — should filter by ROLE_HIERARCHY level'],
+        ['Agent uses wrong tools', 'Guest user getting admin results', 'Tool gating not working', 'Check get_tools_for_role() - should filter by ROLE_HIERARCHY level'],
         ['Token still works after logout', 'GET /me succeeds after POST /logout', 'Blacklist check not in decode path', 'decode_access_token() must call is_token_blacklisted(jti)'],
         ['SQL injection not blocked', 'database_query runs DROP/DELETE', 'Keyword check bypassed', 'Verify semicolons are blocked AND dangerous keywords are checked as whole words'],
         ['Agent loops forever', 'No response, timeout', 'MAX_STEPS not enforced, or LLM not producing Answer:', 'Check MAX_STEPS=5 and _generate_final_answer() fallback'],
-        ['ReAct trace empty', 'reasoning_steps: []', 'Agent answered on first step without acting', 'This is OK — simple questions don\'t need tool calls'],
+        ['ReAct trace empty', 'reasoning_steps: []', 'Agent answered on first step without acting', 'This is OK - simple questions don\'t need tool calls'],
       ]} />
     </Section>
 

@@ -32,10 +32,10 @@ export const projects = [
        ▼
   Return: { access_token: "eyJ..." }`,
     keyLearnings: [
-      'Password is NEVER stored — only the bcrypt hash',
-      'JWT is stateless — server does not store sessions',
-      'Token has expiry (exp claim) — 30 minutes default',
-      'Bearer scheme — token sent in Authorization header',
+      'Password is NEVER stored - only the bcrypt hash',
+      'JWT is stateless - server does not store sessions',
+      'Token has expiry (exp claim) - 30 minutes default',
+      'Bearer scheme - token sent in Authorization header',
       'Account lockout tracks failed_login_attempts in DB',
     ],
   },
@@ -127,10 +127,10 @@ export const projects = [
        │
        ▼
   Tools (RBAC-gated):
-  ✅ public_search   (FAISS)    — guest+
-  ✅ internal_search  (ChromaDB) — user+
-  ✅ admin_search     (ChromaDB) — admin+
-  ❌ database_query   (SQLite)   — super_admin only`,
+  ✅ public_search   (FAISS)    - guest+
+  ✅ internal_search  (ChromaDB) - user+
+  ✅ admin_search     (ChromaDB) - admin+
+  ❌ database_query   (SQLite)   - super_admin only`,
     keyLearnings: [
       'ReAct = Reason + Act. Agent thinks step-by-step, not all-at-once',
       'Tool gating: agent NEVER sees tools above user role level',

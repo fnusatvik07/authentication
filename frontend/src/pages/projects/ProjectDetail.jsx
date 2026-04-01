@@ -71,13 +71,13 @@ export default function ProjectDetail() {
 cd project-2-medium/backend/auth_server
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python main.py  # Port 8000 — generates RSA keys on first run
+python main.py  # Port 8000 - generates RSA keys on first run
 
 # Terminal 2: Resource Server
 cd project-2-medium/backend/resource_server
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python main.py  # Port 8001 — loads public key from auth server
+python main.py  # Port 8001 - loads public key from auth server
 
 # Run tests
 pytest test_project2.py -v  # 58 tests
@@ -98,10 +98,10 @@ python main.py  # Port 8000
 pytest test_project3.py -v  # 62 tests
 
 # Demo accounts:
-#   admin/admin123 (super_admin — 4 tools)
-#   manager/mgr123 (admin — 3 tools)
-#   developer/dev123 (user — 2 tools)
-#   viewer/view123 (guest — 1 tool)`
+#   admin/admin123 (super_admin - 4 tools)
+#   manager/mgr123 (admin - 3 tools)
+#   developer/dev123 (user - 2 tools)
+#   viewer/view123 (guest - 1 tool)`
               : `cd project-1-basic/backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt

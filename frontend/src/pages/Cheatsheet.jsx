@@ -76,12 +76,12 @@ export default function Cheatsheet() {
             ['bcrypt hashing', '✅', '✅', '✅'],
             ['JWT signing', 'HS256', 'RS256', 'HS256'],
             ['Account lockout', '✅', '✅', '✅'],
-            ['Refresh tokens', '—', '✅ (rotation)', '✅ (rotation)'],
-            ['Password reset', '—', '✅', '—'],
-            ['Token blacklisting', '—', '—', '✅ (JTI)'],
-            ['RBAC', '—', '✅', '✅'],
-            ['Audit logging', '—', '—', '✅'],
-            ['ReAct agent', '—', '—', '✅'],
+            ['Refresh tokens', '-', '✅ (rotation)', '✅ (rotation)'],
+            ['Password reset', '-', '✅', '-'],
+            ['Token blacklisting', '-', '-', '✅ (JTI)'],
+            ['RBAC', '-', '✅', '✅'],
+            ['Audit logging', '-', '-', '✅'],
+            ['ReAct agent', '-', '-', '✅'],
             ['Tests', '45', '58', '62'],
           ]} />
         </Section>

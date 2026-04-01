@@ -1,8 +1,8 @@
 /**
- * Mock API Engine — simulates a real auth backend entirely in the browser.
+ * Mock API Engine - simulates a real auth backend entirely in the browser.
  *
  * This teaches authentication by showing real response shapes, status codes,
- * headers, and error messages — without needing a running backend.
+ * headers, and error messages - without needing a running backend.
  *
  * Simulates: registration, login (with lockout), JWT tokens, protected routes,
  * RBAC, refresh tokens, password reset, token blacklisting, and the RAG agent.
@@ -170,7 +170,7 @@ export async function mockFetch(method, path, body, headers = {}) {
     const accessible = resources.filter(r => ACCESS_LEVEL[r.access_level] <= level)
     const levels = Object.entries(ACCESS_LEVEL).filter(([, v]) => v <= level).map(([k]) => k)
     return res(200, { user: payload.sub, role: payload.role, accessible_levels: levels, count: accessible.length, resources: accessible },
-      `Role "${payload.role}" (level ${level}) can see ${levels.join(', ')} resources. Server-side filtering — client never receives restricted data.`)
+      `Role "${payload.role}" (level ${level}) can see ${levels.join(', ')} resources. Server-side filtering - client never receives restricted data.`)
   }
 
   // ── GET /api/tools ──
@@ -229,7 +229,7 @@ export async function mockFetch(method, path, body, headers = {}) {
     const payload = verifyToken(auth)
     if (!payload || payload.error) return res(payload?.error || 401, { detail: payload?.detail || 'Not authenticated' }, payload?._learn)
     blacklist.add(payload.jti)
-    return res(200, { message: 'Logged out — token revoked' },
+    return res(200, { message: 'Logged out - token revoked' },
       `JTI "${payload.jti}" added to blacklist. This specific token is now permanently rejected, even before its exp time.`)
   }
 
@@ -255,14 +255,14 @@ export async function mockFetch(method, path, body, headers = {}) {
   if (method === 'GET' && path === '/api/users') {
     const payload = verifyToken(auth)
     if (!payload || payload.error) return res(payload?.error || 401, { detail: payload?.detail || 'Not authenticated' }, payload?._learn)
-    if ((ROLE_LEVEL[payload.role] ?? 0) < 2) return res(403, { detail: "Requires 'admin' role or higher" }, '403 Forbidden — user IS authenticated but NOT authorized. Their role level is below admin (2).')
+    if ((ROLE_LEVEL[payload.role] ?? 0) < 2) return res(403, { detail: "Requires 'admin' role or higher" }, '403 Forbidden - user IS authenticated but NOT authorized. Their role level is below admin (2).')
     return res(200, users.map(u => ({ id: u.id, username: u.username, email: u.email, role: u.role, department: u.department })),
       'Admin+ endpoint. require_role("admin") checked the JWT role claim before this code ran.')
   }
 
   // ── GET /api/health ──
   if (method === 'GET' && path === '/api/health') {
-    return res(200, { status: 'healthy', service: 'mock-api', mode: 'simulated' }, 'Health check — no auth required. Always returns 200.')
+    return res(200, { status: 'healthy', service: 'mock-api', mode: 'simulated' }, 'Health check - no auth required. Always returns 200.')
   }
 
   // ── 404 ──

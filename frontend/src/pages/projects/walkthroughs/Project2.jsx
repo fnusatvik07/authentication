@@ -5,17 +5,17 @@ import MermaidDiagram from '../../../components/MermaidDiagram'
 export default function Project2() {
   return (<>
     <Section title="The Problem">
-      <P>Project 1 works for a single server. But real applications often have multiple services — an auth server, a resource server, maybe a payment server. They all need to verify JWT tokens. With HS256, that means sharing the same secret key across every server. If <em>any</em> server is compromised, the attacker can forge tokens for any user.</P>
+      <P>Project 1 works for a single server. But real applications often have multiple services - an auth server, a resource server, maybe a payment server. They all need to verify JWT tokens. With HS256, that means sharing the same secret key across every server. If <em>any</em> server is compromised, the attacker can forge tokens for any user.</P>
       <P>This project introduces three upgrades that take your auth system from "works on my laptop" to "production architecture":</P>
       <ol className="list-decimal list-inside space-y-2 text-[var(--color-text-secondary)] ml-4 mb-6">
-        <li><strong>RS256 asymmetric JWT</strong> — Private key signs tokens on the auth server. Resource servers verify with the public key (and can't forge).</li>
-        <li><strong>RBAC with resource-level access</strong> — Users have roles (user/admin/super_admin). Each resource in the database has an access level. Users only see what their role permits.</li>
-        <li><strong>Password reset</strong> — Secure token-based flow for "forgot password," plus account lockout with remaining-attempts feedback.</li>
+        <li><strong>RS256 asymmetric JWT</strong> - Private key signs tokens on the auth server. Resource servers verify with the public key (and can't forge).</li>
+        <li><strong>RBAC with resource-level access</strong> - Users have roles (user/admin/super_admin). Each resource in the database has an access level. Users only see what their role permits.</li>
+        <li><strong>Password reset</strong> - Secure token-based flow for "forgot password," plus account lockout with remaining-attempts feedback.</li>
       </ol>
     </Section>
 
-    <Section title="Architecture — Two Servers">
-      <P>Unlike Project 1 (single server), this project runs <strong>two separate servers</strong>. The auth server (port 8000) handles identity — registration, login, tokens, user management. The resource server (port 8001) serves protected data. They communicate through JWT tokens, but critically, they have <em>different</em> keys.</P>
+    <Section title="Architecture - Two Servers">
+      <P>Unlike Project 1 (single server), this project runs <strong>two separate servers</strong>. The auth server (port 8000) handles identity - registration, login, tokens, user management. The resource server (port 8001) serves protected data. They communicate through JWT tokens, but critically, they have <em>different</em> keys.</P>
 
       <MermaidDiagram title="Two-server architecture with RS256" chart={`sequenceDiagram
     participant F as 🌐 Frontend
@@ -58,10 +58,10 @@ export default function Project2() {
       ]} />
     </Section>
 
-    <Section title="RS256 — Key Generation & Usage">
+    <Section title="RS256 - Key Generation & Usage">
       <P>The first thing that happens when you start the auth server is RSA key generation. If no keys exist, it creates a 2048-bit RSA key pair and saves them to disk.</P>
 
-      <CodeBlock title="keys.py — RSA key pair generation" language="python" code={`from cryptography.hazmat.primitives.asymmetric import rsa
+      <CodeBlock title="keys.py - RSA key pair generation" language="python" code={`from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from pathlib import Path
 
@@ -71,7 +71,7 @@ def generate_rsa_keys():
     KEYS_DIR.mkdir(exist_ok=True)
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 
-    # Private key — stays on auth server, NEVER shared
+    # Private key - stays on auth server, NEVER shared
     private_pem = private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.PKCS8,
@@ -79,7 +79,7 @@ def generate_rsa_keys():
     )
     (KEYS_DIR / "private.pem").write_bytes(private_pem)
 
-    # Public key — safe to distribute to ALL resource servers
+    # Public key - safe to distribute to ALL resource servers
     public_pem = private_key.public_key().public_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo,
@@ -88,7 +88,7 @@ def generate_rsa_keys():
 
       <P>The auth server <strong>signs</strong> tokens with the private key. The resource server <strong>verifies</strong> with the public key. The critical security property: the resource server <em>cannot forge tokens</em>, even if it's completely compromised.</P>
 
-      <CodeBlock title="auth.py — RS256 signing and verification" language="python" code={`from keys import load_private_key, load_public_key
+      <CodeBlock title="auth.py - RS256 signing and verification" language="python" code={`from keys import load_private_key, load_public_key
 
 PRIVATE_KEY = load_private_key()  # Auth server only
 PUBLIC_KEY = load_public_key()    # Both servers
@@ -96,14 +96,14 @@ PUBLIC_KEY = load_public_key()    # Both servers
 ALGORITHM = "RS256"
 
 def create_access_token(data: dict) -> str:
-    """Sign with PRIVATE key — only auth server can do this."""
+    """Sign with PRIVATE key - only auth server can do this."""
     to_encode = data.copy()
     to_encode["exp"] = datetime.now(timezone.utc) + timedelta(hours=1)
     to_encode["type"] = "access"
     return jwt.encode(to_encode, PRIVATE_KEY, algorithm=ALGORITHM)
 
 def decode_access_token(token: str) -> dict:
-    """Verify with PUBLIC key — any server can do this."""
+    """Verify with PUBLIC key - any server can do this."""
     payload = jwt.decode(token, PUBLIC_KEY, algorithms=[ALGORITHM])
     if payload.get("type") != "access":
         raise HTTPException(401, "Invalid token type")
@@ -114,11 +114,11 @@ def decode_access_token(token: str) -> dict:
       <CodeBlock title="Public key endpoint" language="python" code={`@app.get("/api/public-key")
 def get_public_key():
     """Resource servers call this to get the verification key.
-    100% safe to expose — it can verify tokens but NOT create them."""
+    100% safe to expose - it can verify tokens but NOT create them."""
     return {"public_key": PUBLIC_KEY.decode("utf-8"), "algorithm": "RS256"}`} />
     </Section>
 
-    <Section title="RBAC — Role-Based Resource Filtering">
+    <Section title="RBAC - Role-Based Resource Filtering">
       <P>The resource server stores 15 sample resources, each with an access level: public, user, admin, or super_admin. When a user requests resources, the server decodes their JWT, extracts their role, and filters the results.</P>
 
       <MermaidDiagram title="What each role can see" chart={`flowchart LR
@@ -144,7 +144,7 @@ def get_public_key():
     style A fill:#fffbeb,stroke:#d97706
     style SA fill:#fef2f2,stroke:#dc2626`} />
 
-      <CodeBlock title="Resource server — RBAC filtering" language="python" code={`ROLE_HIERARCHY = {"user": 1, "admin": 2, "super_admin": 3}
+      <CodeBlock title="Resource server - RBAC filtering" language="python" code={`ROLE_HIERARCHY = {"user": 1, "admin": 2, "super_admin": 3}
 ACCESS_LEVEL_TO_ROLE = {"public": 0, "user": 1, "admin": 2, "super_admin": 3}
 
 def get_accessible_levels(user_role: str) -> list[str]:
@@ -160,7 +160,7 @@ def list_resources(current_user = Depends(get_current_user)):
 
     resources = db.execute(
         "SELECT * FROM resources WHERE access_level IN (?)",
-        accessible  # Server-side filtering — client never sees restricted data
+        accessible  # Server-side filtering - client never sees restricted data
     )
     return {"role": role, "accessible_levels": accessible, "resources": resources}`} />
     </Section>
@@ -184,7 +184,7 @@ def list_resources(current_user = Depends(get_current_user)):
       </InfoBox>
     </Section>
 
-    <Section title="Testing — 58 Tests">
+    <Section title="Testing - 58 Tests">
       <ComparisonTable headers={['Category', 'Tests', 'What they verify']} rows={[
         ['Role Hierarchy', '5', 'Ordering, higher-passes-lower, lower-denied-higher, exact match'],
         ['Refresh Tokens', '4', 'Uniqueness, length, hash determinism, rotation'],
@@ -206,8 +206,8 @@ def list_resources(current_user = Depends(get_current_user)):
           { num: '02', text: 'RBAC filtering happens SERVER-SIDE. The database query itself filters by role. The client never receives data it shouldn\'t see.' },
           { num: '03', text: 'Refresh token rotation revokes the old token every time. If an attacker steals a token, it\'s only usable once.' },
           { num: '04', text: 'Password reset uses separate random tokens (not JWTs), stored as hashes, single-use, with time expiry.' },
-          { num: '05', text: 'The public key endpoint lets resource servers dynamically fetch the verification key — no secret sharing needed.' },
-          { num: '06', text: 'Account lockout now shows "3 attempts remaining" — better UX than a sudden lock.' },
+          { num: '05', text: 'The public key endpoint lets resource servers dynamically fetch the verification key - no secret sharing needed.' },
+          { num: '06', text: 'Account lockout now shows "3 attempts remaining" - better UX than a sudden lock.' },
         ].map(item => (
           <div key={item.num} className="flex gap-3 p-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl">
             <span className="text-[var(--color-primary)] font-bold font-mono text-sm flex-shrink-0">{item.num}</span>
@@ -221,10 +221,10 @@ def list_resources(current_user = Depends(get_current_user)):
       <ComparisonTable headers={['Problem', 'Symptom', 'Cause', 'Fix']} rows={[
         ['Resource server can\'t verify tokens', '401 on all resource server requests', 'Public key not found or wrong path', 'Run auth server first (generates keys), check jwt_keys/public.pem exists'],
         ['Token from auth server rejected by resource server', 'jwt.InvalidSignatureError', 'Servers using different algorithms (HS256 vs RS256)', 'Both must use RS256. Check ALGORITHM constant in both servers'],
-        ['Password reset token "already used"', '400 error on second reset attempt', 'Tokens are single-use by design', 'Request a new reset token — each one can only be used once'],
-        ['User role didn\'t change after admin update', 'Still seeing old resources', 'JWT still has old role — need to re-login', 'After role change, user must login again to get a new JWT with updated role'],
+        ['Password reset token "already used"', '400 error on second reset attempt', 'Tokens are single-use by design', 'Request a new reset token - each one can only be used once'],
+        ['User role didn\'t change after admin update', 'Still seeing old resources', 'JWT still has old role - need to re-login', 'After role change, user must login again to get a new JWT with updated role'],
         ['Two terminals needed', 'Resource server returns 404', 'Only auth server is running', 'Project 2 requires TWO terminals: auth (port 8000) + resource (port 8001)'],
-        ['Lockout not clearing', '423 after waiting 15 minutes', 'System clock timezone issue', 'Ensure server uses timezone.utc consistently — check locked_until in DB'],
+        ['Lockout not clearing', '423 after waiting 15 minutes', 'System clock timezone issue', 'Ensure server uses timezone.utc consistently - check locked_until in DB'],
       ]} />
     </Section>
 

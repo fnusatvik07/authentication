@@ -13,7 +13,7 @@ export default function Playground() {
       <div className="max-w-5xl mx-auto px-6 pt-24 pb-16">
         <h1 className="text-3xl font-bold mb-2">API Playground</h1>
         <p className="text-[var(--color-text-muted)] mb-6">
-          Learn authentication by doing. No backend needed — everything runs in your browser.
+          Learn authentication by doing. No backend needed - everything runs in your browser.
         </p>
 
         {/* Tab switcher */}
@@ -53,7 +53,7 @@ export default function Playground() {
             <div className="p-3 bg-purple-50 border border-purple-100 rounded-xl text-[13px] text-purple-800 mb-6 flex items-start gap-2">
               <span className="text-base">🧪</span>
               <div>
-                <strong>Simulated mode</strong> — try any endpoint with any data. Auto-captures JWT from login. Pre-built users: <code className="bg-purple-100 px-1 rounded">alice/admin123</code> (admin), <code className="bg-purple-100 px-1 rounded">bob/bob123</code> (user), <code className="bg-purple-100 px-1 rounded">viewer/view123</code> (guest). Uncheck "Simulated mode" to hit a real backend.
+                <strong>Simulated mode</strong> - try any endpoint with any data. Auto-captures JWT from login. Pre-built users: <code className="bg-purple-100 px-1 rounded">alice/admin123</code> (admin), <code className="bg-purple-100 px-1 rounded">bob/bob123</code> (user), <code className="bg-purple-100 px-1 rounded">viewer/view123</code> (guest). Uncheck "Simulated mode" to hit a real backend.
               </div>
             </div>
             <APIPlayground baseUrl="http://localhost:8000" />

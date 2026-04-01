@@ -6,12 +6,12 @@ const STEPS = [
   {
     id: 1,
     title: 'Register a new user',
-    description: 'Every auth system starts here. The server hashes the password with bcrypt and stores only the hash — never the plaintext.',
+    description: 'Every auth system starts here. The server hashes the password with bcrypt and stores only the hash - never the plaintext.',
     method: 'POST',
     path: '/api/register',
     body: { username: 'demo', email: 'demo@example.com', password: 'SecureP@ss123' },
     expectStatus: 201,
-    whatToNotice: 'The response contains id, username, email, role — but NO password. The server stored a bcrypt hash internally, but never returns it.',
+    whatToNotice: 'The response contains id, username, email, role - but NO password. The server stored a bcrypt hash internally, but never returns it.',
   },
   {
     id: 2,
@@ -33,7 +33,7 @@ const STEPS = [
     body: null,
     needsAuth: true,
     expectStatus: 200,
-    whatToNotice: 'The server knew you were "demo" without a database lookup — your identity was embedded in the JWT payload. This is what "stateless" means.',
+    whatToNotice: 'The server knew you were "demo" without a database lookup - your identity was embedded in the JWT payload. This is what "stateless" means.',
   },
   {
     id: 4,
@@ -44,7 +44,7 @@ const STEPS = [
     body: null,
     needsAuth: false,
     expectStatus: 401,
-    whatToNotice: '401 Unauthorized — "Not authenticated." The server cannot identify you without a valid JWT. This is AuthN failure (authentication, not authorization).',
+    whatToNotice: '401 Unauthorized - "Not authenticated." The server cannot identify you without a valid JWT. This is AuthN failure (authentication, not authorization).',
   },
   {
     id: 5,
@@ -58,14 +58,14 @@ const STEPS = [
   },
   {
     id: 6,
-    title: 'See RBAC in action — resources filtered by role',
-    description: 'Different roles see different data. Your "demo" account has role "user" — you\'ll see public and user-level resources, but NOT admin or super_admin content.',
+    title: 'See RBAC in action - resources filtered by role',
+    description: 'Different roles see different data. Your "demo" account has role "user" - you\'ll see public and user-level resources, but NOT admin or super_admin content.',
     method: 'GET',
     path: '/api/resources',
     body: null,
     needsAuth: true,
     expectStatus: 200,
-    whatToNotice: 'Look at accessible_levels — you can only see "public" and "user" resources. Admin docs (costs, security) are filtered out server-side. The client never even receives them.',
+    whatToNotice: 'Look at accessible_levels - you can only see "public" and "user" resources. Admin docs (costs, security) are filtered out server-side. The client never even receives them.',
   },
   {
     id: 7,
@@ -76,18 +76,18 @@ const STEPS = [
     body: null,
     needsAuth: true,
     expectStatus: 200,
-    whatToNotice: 'As a "user" role, you get public_search and internal_search (accessible: true). admin_search and database_query show accessible: false — the agent literally cannot use them.',
+    whatToNotice: 'As a "user" role, you get public_search and internal_search (accessible: true). admin_search and database_query show accessible: false - the agent literally cannot use them.',
   },
   {
     id: 8,
-    title: 'Logout — blacklist your token',
-    description: 'JWTs are stateless — the server can\'t "delete" them. But with JTI blacklisting, logout adds the token\'s unique ID to a blacklist. Every future request checks it.',
+    title: 'Logout - blacklist your token',
+    description: 'JWTs are stateless - the server can\'t "delete" them. But with JTI blacklisting, logout adds the token\'s unique ID to a blacklist. Every future request checks it.',
     method: 'POST',
     path: '/api/logout',
     body: null,
     needsAuth: true,
     expectStatus: 200,
-    whatToNotice: 'Your token\'s JTI was added to the blacklist. If you try to use this same token again (Step 9), it will be rejected — even though it hasn\'t expired yet.',
+    whatToNotice: 'Your token\'s JTI was added to the blacklist. If you try to use this same token again (Step 9), it will be rejected - even though it hasn\'t expired yet.',
     blacklistsToken: true,
   },
   {
@@ -99,7 +99,7 @@ const STEPS = [
     body: null,
     needsAuth: true,
     expectStatus: 401,
-    whatToNotice: '"Token has been revoked" — the JTI blacklist caught it. This solves the biggest JWT criticism: "you can\'t revoke a JWT." You can, with JTI blacklisting.',
+    whatToNotice: '"Token has been revoked" - the JTI blacklist caught it. This solves the biggest JWT criticism: "you can\'t revoke a JWT." You can, with JTI blacklisting.',
   },
 ]
 
@@ -200,7 +200,7 @@ export default function GuidedTutorial() {
 
         {step.needsAuth && (
           <div className="text-[11px] text-[var(--color-text-dim)] mb-3 flex items-center gap-1">
-            🔑 Authorization: Bearer {token ? token.slice(0, 30) + '...' : '(no token yet — complete step 2 first)'}
+            🔑 Authorization: Bearer {token ? token.slice(0, 30) + '...' : '(no token yet - complete step 2 first)'}
           </div>
         )}
 
