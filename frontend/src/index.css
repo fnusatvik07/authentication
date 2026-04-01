@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #ffffff;
+  --color-surface: #f8fafc;
+  --color-surface2: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-border-light: #f1f5f9;
+  --color-text: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
+  --color-text-dim: #94a3b8;
+  --color-primary: #4f46e5;
+  --color-primary-light: #6366f1;
+  --color-primary-bg: #eef2ff;
+  --color-primary-text: #3730a3;
+  --color-green: #059669;
+  --color-green-bg: #ecfdf5;
+  --color-green-text: #065f46;
+  --color-orange: #d97706;
+  --color-orange-bg: #fffbeb;
+  --color-orange-text: #92400e;
+  --color-purple: #7c3aed;
+  --color-purple-bg: #f5f3ff;
+  --color-purple-text: #5b21b6;
+  --color-red: #dc2626;
+  --color-red-bg: #fef2f2;
+  --color-red-text: #991b1b;
+  --color-blue: #2563eb;
+  --color-blue-bg: #eff6ff;
+  --color-blue-text: #1e40af;
+}
+
+/* Dark mode overrides */
+.dark {
+  --color-bg: #0a0a1a;
+  --color-surface: #111827;
+  --color-surface2: #1a1a2e;
+  --color-border: #1f2937;
+  --color-border-light: #1f2937;
+  --color-text: #e2e8f0;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-text-dim: #64748b;
+  --color-primary: #818cf8;
+  --color-primary-light: #a5b4fc;
+  --color-primary-bg: #1e1b4b;
+  --color-primary-text: #c7d2fe;
+  --color-green: #34d399;
+  --color-green-bg: #064e3b;
+  --color-green-text: #6ee7b7;
+  --color-orange: #fbbf24;
+  --color-orange-bg: #451a03;
+  --color-orange-text: #fcd34d;
+  --color-purple: #a78bfa;
+  --color-purple-bg: #2e1065;
+  --color-purple-text: #c4b5fd;
+  --color-red: #f87171;
+  --color-red-bg: #450a0a;
+  --color-red-text: #fca5a5;
+  --color-blue: #60a5fa;
+  --color-blue-bg: #1e3a5f;
+  --color-blue-text: #93c5fd;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+::selection {
+  background: var(--color-primary);
+  color: white;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-dim); }

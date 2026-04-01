@@ -1,0 +1,38 @@
+# Environment
+.env
+*.db
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Vector DB data
+*.index
+*_docs.json
+chroma_data/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Frontend build
+frontend/node_modules/
+frontend/dist/
+
+# RSA keys (generated at runtime)
+jwt_keys/
+
+# Test artifacts
+test_*.db
+.pytest_cache/
+.claude/

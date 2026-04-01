@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 2: RBAC Authentication</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a; color: #e2e8f0; min-height: 100vh;
+        }
+        .navbar {
+            background: #1e293b; padding: 12px 24px; display: flex;
+            justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+        .navbar h1 { color: #38bdf8; font-size: 1.2rem; }
+        .navbar .user-info { display: flex; align-items: center; gap: 12px; }
+        .role-badge {
+            padding: 4px 12px; border-radius: 20px; font-size: 0.75rem;
+            font-weight: 600; text-transform: uppercase;
+        }
+        .role-user { background: #065f46; color: #6ee7b7; }
+        .role-admin { background: #7c2d12; color: #fdba74; }
+        .role-super_admin { background: #581c87; color: #d8b4fe; }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 24px; }
+
+        /* Auth Forms */
+        .auth-container { max-width: 400px; margin: 80px auto; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tab {
+            flex: 1; padding: 10px; text-align: center; cursor: pointer;
+            border: 1px solid #334155; border-radius: 8px; background: #1e293b;
+            color: #94a3b8; transition: all 0.2s;
+        }
+        .tab.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 4px; color: #94a3b8; font-size: 0.85rem; }
+        input, select {
+            width: 100%; padding: 10px 12px; border: 1px solid #334155;
+            border-radius: 8px; background: #1e293b; color: #e2e8f0; font-size: 0.95rem;
+        }
+        input:focus, select:focus { border-color: #38bdf8; outline: none; }
+        button {
+            padding: 10px 20px; border: none; border-radius: 8px;
+            background: #38bdf8; color: #0f172a; font-weight: 600; cursor: pointer;
+        }
+        button:hover { background: #7dd3fc; }
+        .btn-full { width: 100%; padding: 12px; }
+        .btn-danger { background: #991b1b; color: #fca5a5; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+        .message { margin-top: 12px; padding: 10px; border-radius: 8px; font-size: 0.85rem; }
+        .msg-success { background: #064e3b; color: #6ee7b7; }
+        .msg-error { background: #450a0a; color: #fca5a5; }
+
+        /* Dashboard */
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card {
+            background: #1e293b; padding: 20px; border-radius: 12px;
+            border: 1px solid #334155; text-align: center;
+        }
+        .stat-card .number { font-size: 2rem; font-weight: 700; color: #38bdf8; }
+        .stat-card .label { color: #94a3b8; font-size: 0.85rem; margin-top: 4px; }
+
+        .resource-grid { display: grid; gap: 12px; }
+        .resource-card {
+            background: #1e293b; padding: 16px; border-radius: 10px;
+            border: 1px solid #334155; display: flex; justify-content: space-between;
+            align-items: start;
+        }
+        .resource-card .title { font-weight: 600; margin-bottom: 4px; }
+        .resource-card .content { color: #94a3b8; font-size: 0.9rem; }
+        .resource-card .meta { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+        .access-badge {
+            padding: 3px 8px; border-radius: 4px; font-size: 0.7rem;
+            font-weight: 600; text-transform: uppercase;
+        }
+        .access-public { background: #1e3a5f; color: #7dd3fc; }
+        .access-user { background: #065f46; color: #6ee7b7; }
+        .access-admin { background: #7c2d12; color: #fdba74; }
+        .access-super_admin { background: #581c87; color: #d8b4fe; }
+
+        .category-filter { margin-bottom: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .filter-btn {
+            padding: 6px 14px; border-radius: 20px; border: 1px solid #334155;
+            background: #1e293b; color: #94a3b8; cursor: pointer; font-size: 0.8rem;
+        }
+        .filter-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
+
+        /* Admin Panel */
+        .admin-section { margin-top: 24px; }
+        .admin-section h3 { margin-bottom: 12px; color: #38bdf8; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #334155; }
+        th { color: #94a3b8; font-size: 0.85rem; }
+
+        .hidden { display: none; }
+        .section-title { font-size: 1.3rem; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <!-- Auth Section -->
+    <div id="auth-page">
+        <div class="auth-container">
+            <h1 style="text-align:center; color:#38bdf8; margin-bottom:8px">RBAC Authentication</h1>
+            <p style="text-align:center; color:#94a3b8; margin-bottom:24px; font-size:0.9rem">Project 2 — Role-Based Access Control</p>
+
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('login')">Login</div>
+                <div class="tab" onclick="switchTab('register')">Register</div>
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group"><label>Username</label><input type="text" id="l-user" required></div>
+                <div class="form-group"><label>Password</label><input type="password" id="l-pass" required></div>
+                <button type="submit" class="btn-full">Login</button>
+            </form>
+
+            <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
+                <div class="form-group"><label>Username</label><input type="text" id="r-user" required></div>
+                <div class="form-group"><label>Email</label><input type="email" id="r-email" required></div>
+                <div class="form-group"><label>Password</label><input type="password" id="r-pass" required></div>
+                <button type="submit" class="btn-full">Register</button>
+            </form>
+
+            <div id="auth-msg"></div>
+            <p style="text-align:center; color:#64748b; margin-top:16px; font-size:0.8rem">
+                Default admin: admin / admin123
+            </p>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard-page" class="hidden">
+        <nav class="navbar">
+            <h1>RBAC Dashboard</h1>
+            <div class="user-info">
+                <span id="nav-user"></span>
+                <span id="nav-role" class="role-badge"></span>
+                <button class="btn-danger btn-sm" onclick="logout()">Logout</button>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="stats">
+                <div class="stat-card"><div class="number" id="stat-total">0</div><div class="label">Accessible Resources</div></div>
+                <div class="stat-card"><div class="number" id="stat-levels">0</div><div class="label">Access Levels</div></div>
+                <div class="stat-card"><div class="number" id="stat-role">-</div><div class="label">Your Role</div></div>
+            </div>
+
+            <h2 class="section-title">Resources</h2>
+            <div class="category-filter" id="category-filter"></div>
+            <div class="resource-grid" id="resource-list"></div>
+
+            <!-- Admin Section -->
+            <div id="admin-section" class="admin-section hidden">
+                <h3>User Management (Admin Only)</h3>
+                <table id="users-table">
+                    <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Actions</th></tr></thead>
+                    <tbody id="users-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const AUTH_API = "http://localhost:8000/api";
+        const RES_API = "http://localhost:8001/api";
+        let tokens = { access: null, refresh: null };
+        let currentUser = null;
+        let currentFilter = null;
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('auth-msg').innerHTML = '';
+            if (tab === 'login') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('login-form').classList.remove('hidden');
+                document.getElementById('register-form').classList.add('hidden');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('register-form').classList.remove('hidden');
+            }
+        }
+
+        function showMsg(id, text, type) {
+            document.getElementById(id).innerHTML = `<div class="message msg-${type}">${text}</div>`;
+        }
+
+        async function apiFetch(url, options = {}) {
+            if (tokens.access) {
+                options.headers = { ...options.headers, Authorization: `Bearer ${tokens.access}` };
+            }
+            const res = await fetch(url, options);
+            if (res.status === 401 && tokens.refresh) {
+                // Try refresh
+                const refreshRes = await fetch(`${AUTH_API}/refresh`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ refresh_token: tokens.refresh }),
+                });
+                if (refreshRes.ok) {
+                    const data = await refreshRes.json();
+                    tokens.access = data.access_token;
+                    tokens.refresh = data.refresh_token;
+                    options.headers.Authorization = `Bearer ${tokens.access}`;
+                    return fetch(url, options);
+                } else {
+                    logout();
+                    throw new Error("Session expired");
+                }
+            }
+            return res;
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            try {
+                const res = await fetch(`${AUTH_API}/register`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: document.getElementById("r-user").value,
+                        email: document.getElementById("r-email").value,
+                        password: document.getElementById("r-pass").value,
+                    }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail);
+                showMsg("auth-msg", "Registered! Please login.", "success");
+                switchTab("login");
+            } catch (err) { showMsg("auth-msg", err.message, "error"); }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            try {
+                const res = await fetch(`${AUTH_API}/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: document.getElementById("l-user").value,
+                        password: document.getElementById("l-pass").value,
+                    }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail);
+                tokens.access = data.access_token;
+                tokens.refresh = data.refresh_token;
+                await loadDashboard();
+            } catch (err) { showMsg("auth-msg", err.message, "error"); }
+        }
+
+        async function loadDashboard() {
+            // Get user profile
+            const meRes = await apiFetch(`${AUTH_API}/me`);
+            currentUser = await meRes.json();
+
+            document.getElementById("auth-page").classList.add("hidden");
+            document.getElementById("dashboard-page").classList.remove("hidden");
+            document.getElementById("nav-user").textContent = currentUser.username;
+
+            const roleBadge = document.getElementById("nav-role");
+            roleBadge.textContent = currentUser.role;
+            roleBadge.className = `role-badge role-${currentUser.role}`;
+            document.getElementById("stat-role").textContent = currentUser.role;
+
+            await loadResources();
+            await loadCategories();
+
+            // Show admin section for admin+
+            const roleLevel = { user: 1, admin: 2, super_admin: 3 };
+            if (roleLevel[currentUser.role] >= 2) {
+                document.getElementById("admin-section").classList.remove("hidden");
+                await loadUsers();
+            }
+        }
+
+        async function loadResources(category = null) {
+            let url = `${RES_API}/resources`;
+            if (category) url += `?category=${category}`;
+            const res = await apiFetch(url);
+            const data = await res.json();
+
+            document.getElementById("stat-total").textContent = data.count;
+            document.getElementById("stat-levels").textContent = data.accessible_levels.length;
+
+            const grid = document.getElementById("resource-list");
+            grid.innerHTML = data.resources.map(r => `
+                <div class="resource-card">
+                    <div>
+                        <div class="title">${r.title}</div>
+                        <div class="content">${r.content}</div>
+                    </div>
+                    <div class="meta">
+                        <span class="access-badge access-${r.access_level}">${r.access_level}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadCategories() {
+            const res = await apiFetch(`${RES_API}/categories`);
+            const data = await res.json();
+            const container = document.getElementById("category-filter");
+            container.innerHTML = `<div class="filter-btn active" onclick="filterCategory(null, this)">All</div>` +
+                data.map(c => `<div class="filter-btn" onclick="filterCategory('${c.category}', this)">${c.category} (${c.count})</div>`).join('');
+        }
+
+        function filterCategory(cat, el) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            loadResources(cat);
+        }
+
+        async function loadUsers() {
+            const res = await apiFetch(`${AUTH_API}/users`);
+            if (!res.ok) return;
+            const users = await res.json();
+            const tbody = document.getElementById("users-tbody");
+            tbody.innerHTML = users.map(u => `
+                <tr>
+                    <td>${u.id}</td>
+                    <td>${u.username}</td>
+                    <td>${u.email}</td>
+                    <td><span class="role-badge role-${u.role}" style="font-size:0.7rem">${u.role}</span></td>
+                    <td>${currentUser.role === 'super_admin' ? `
+                        <select onchange="updateRole(${u.id}, this.value)" style="padding:4px;background:#0f172a;color:#e2e8f0;border:1px solid #334155;border-radius:4px">
+                            <option value="user" ${u.role==='user'?'selected':''}>user</option>
+                            <option value="admin" ${u.role==='admin'?'selected':''}>admin</option>
+                            <option value="super_admin" ${u.role==='super_admin'?'selected':''}>super_admin</option>
+                        </select>
+                    ` : '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function updateRole(userId, newRole) {
+            await apiFetch(`${AUTH_API}/users/${userId}/role`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ role: newRole }),
+            });
+            await loadUsers();
+        }
+
+        function logout() {
+            if (tokens.refresh) {
+                fetch(`${AUTH_API}/logout`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ refresh_token: tokens.refresh }),
+                });
+            }
+            tokens = { access: null, refresh: null };
+            currentUser = null;
+            document.getElementById("auth-page").classList.remove("hidden");
+            document.getElementById("dashboard-page").classList.add("hidden");
+            document.getElementById("admin-section").classList.add("hidden");
+        }
+    </script>
+</body>
+</html>

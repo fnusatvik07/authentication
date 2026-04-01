@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # Project 1: Basic JWT Auth
+  project-1:
+    build:
+      context: ./project-1-basic/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    environment:
+      - SECRET_KEY=docker-dev-secret-project1
+    volumes:
+      - ./project-1-basic/backend:/app
+
+  # Project 2: Auth Server (RS256)
+  project-2-auth:
+    build:
+      context: ./project-2-medium/backend/auth_server
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8000"
+    environment:
+      - SECRET_KEY=docker-dev-secret-project2
+    volumes:
+      - ./project-2-medium/backend/auth_server:/app
+      - jwt-keys:/app/jwt_keys
+
+  # Project 2: Resource Server
+  project-2-resource:
+    build:
+      context: ./project-2-medium/backend/resource_server
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8001"
+    volumes:
+      - ./project-2-medium/backend/resource_server:/app
+      - jwt-keys:/app/../auth_server/jwt_keys
+    depends_on:
+      - project-2-auth
+
+  # Project 3: Agentic RAG
+  project-3:
+    build:
+      context: ./project-3-advanced/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8004:8000"
+    environment:
+      - SECRET_KEY=docker-dev-secret-project3
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    volumes:
+      - ./project-3-advanced/backend:/app
+
+  # Frontend (Learning Site)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+
+volumes:
+  jwt-keys:

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 3: Agentic RAG with Auth</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a1a; color: #e2e8f0; min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #111827; padding: 10px 20px; display: flex;
+            justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #1f2937;
+        }
+        .navbar h1 { color: #818cf8; font-size: 1.1rem; }
+        .navbar .right { display: flex; align-items: center; gap: 10px; }
+        .role-badge {
+            padding: 3px 10px; border-radius: 20px; font-size: 0.7rem;
+            font-weight: 600; text-transform: uppercase;
+        }
+        .role-guest { background: #374151; color: #9ca3af; }
+        .role-user { background: #065f46; color: #6ee7b7; }
+        .role-admin { background: #7c2d12; color: #fdba74; }
+        .role-super_admin { background: #581c87; color: #d8b4fe; }
+
+        /* Layout */
+        .layout { display: flex; height: calc(100vh - 49px); }
+        .sidebar {
+            width: 260px; background: #111827; border-right: 1px solid #1f2937;
+            padding: 16px; overflow-y: auto; flex-shrink: 0;
+        }
+        .main { flex: 1; display: flex; flex-direction: column; }
+
+        /* Sidebar */
+        .sidebar h3 { color: #818cf8; font-size: 0.85rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .tool-card {
+            background: #1a1a2e; border: 1px solid #1f2937; border-radius: 8px;
+            padding: 10px; margin-bottom: 8px;
+        }
+        .tool-card .name { font-weight: 600; font-size: 0.85rem; }
+        .tool-card .desc { color: #6b7280; font-size: 0.75rem; margin-top: 2px; }
+        .tool-card .access { font-size: 0.65rem; margin-top: 4px; }
+        .tool-card.locked { opacity: 0.4; }
+        .tool-card.unlocked { border-color: #818cf8; }
+        .tab-list { margin-top: 20px; }
+        .sidebar-tab {
+            display: block; width: 100%; padding: 8px 12px; margin-bottom: 4px;
+            background: none; border: 1px solid transparent; border-radius: 6px;
+            color: #9ca3af; cursor: pointer; text-align: left; font-size: 0.85rem;
+        }
+        .sidebar-tab:hover { background: #1a1a2e; }
+        .sidebar-tab.active { background: #1a1a2e; border-color: #818cf8; color: #818cf8; }
+
+        /* Auth Page */
+        .auth-page {
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; width: 100%;
+        }
+        .auth-box { width: 380px; }
+        .auth-box h1 { text-align: center; color: #818cf8; margin-bottom: 4px; font-size: 1.6rem; }
+        .auth-box .sub { text-align: center; color: #6b7280; margin-bottom: 24px; font-size: 0.85rem; }
+        .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+        .tab {
+            flex: 1; padding: 8px; text-align: center; cursor: pointer;
+            border: 1px solid #1f2937; border-radius: 6px; background: #111827;
+            color: #6b7280; font-size: 0.9rem;
+        }
+        .tab.active { background: #818cf8; color: #0a0a1a; border-color: #818cf8; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; color: #6b7280; font-size: 0.8rem; margin-bottom: 3px; }
+        input, select {
+            width: 100%; padding: 9px 11px; border: 1px solid #1f2937;
+            border-radius: 6px; background: #111827; color: #e2e8f0; font-size: 0.9rem;
+        }
+        input:focus, select:focus { border-color: #818cf8; outline: none; }
+        .btn {
+            padding: 10px 18px; border: none; border-radius: 6px;
+            background: #818cf8; color: #0a0a1a; font-weight: 600;
+            cursor: pointer; font-size: 0.9rem;
+        }
+        .btn:hover { background: #a5b4fc; }
+        .btn-full { width: 100%; }
+        .btn-sm { padding: 5px 10px; font-size: 0.75rem; }
+        .btn-danger { background: #991b1b; color: #fca5a5; }
+        .btn-ghost { background: transparent; color: #818cf8; border: 1px solid #818cf8; }
+        .msg { margin-top: 10px; padding: 8px; border-radius: 6px; font-size: 0.8rem; }
+        .msg-ok { background: #064e3b; color: #6ee7b7; }
+        .msg-err { background: #450a0a; color: #fca5a5; }
+
+        /* Chat */
+        .chat-area { flex: 1; overflow-y: auto; padding: 20px; }
+        .chat-input-area {
+            padding: 12px 20px; border-top: 1px solid #1f2937;
+            display: flex; gap: 8px; background: #111827;
+        }
+        .chat-input-area input { flex: 1; }
+
+        .message-bubble { margin-bottom: 16px; max-width: 85%; }
+        .message-bubble.user { margin-left: auto; }
+        .message-bubble .bubble {
+            padding: 12px 16px; border-radius: 12px; font-size: 0.9rem; line-height: 1.5;
+        }
+        .message-bubble.user .bubble { background: #312e81; color: #c7d2fe; border-bottom-right-radius: 4px; }
+        .message-bubble.bot .bubble { background: #1a1a2e; color: #e2e8f0; border-bottom-left-radius: 4px; border: 1px solid #1f2937; }
+        .message-bubble .meta { font-size: 0.7rem; color: #4b5563; margin-top: 4px; padding: 0 4px; }
+        .tools-used {
+            display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap;
+        }
+        .tool-tag {
+            padding: 2px 8px; background: #1e1b4b; color: #818cf8;
+            border-radius: 4px; font-size: 0.65rem; font-weight: 600;
+        }
+        .sources-toggle {
+            color: #818cf8; font-size: 0.75rem; cursor: pointer;
+            margin-top: 6px; display: inline-block;
+        }
+        .sources-list {
+            display: none; margin-top: 6px; font-size: 0.75rem; color: #6b7280;
+            background: #0f0f23; padding: 8px; border-radius: 6px;
+        }
+        .sources-list.open { display: block; }
+
+        /* ReAct reasoning trace */
+        .reasoning-trace {
+            display: none; margin-top: 8px; font-size: 0.75rem;
+            background: #0f0f23; border-radius: 6px; padding: 0; overflow: hidden;
+            border: 1px solid #1f2937;
+        }
+        .reasoning-trace.open { display: block; }
+        .react-step { padding: 8px 10px; border-bottom: 1px solid #1f2937; }
+        .react-step:last-child { border-bottom: none; }
+        .react-step .step-label {
+            font-weight: 600; font-size: 0.65rem; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 3px;
+        }
+        .react-step .step-content { color: #9ca3af; line-height: 1.4; }
+        .step-thought .step-label { color: #818cf8; }
+        .step-observation .step-label { color: #34d399; }
+        .step-error .step-label { color: #f87171; }
+        .step-tool-name { color: #818cf8; font-weight: 600; }
+        .reasoning-toggle {
+            color: #818cf8; font-size: 0.7rem; cursor: pointer;
+            margin-top: 6px; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .reasoning-toggle::before { content: ""; display: inline-block; width: 0; height: 0;
+            border-left: 4px solid currentColor; border-top: 3px solid transparent;
+            border-bottom: 3px solid transparent; transition: transform 0.2s; }
+        .reasoning-toggle.open::before { transform: rotate(90deg); }
+        .step-count-badge {
+            display: inline-block; padding: 1px 6px; background: #1e1b4b;
+            color: #818cf8; border-radius: 3px; font-size: 0.6rem; font-weight: 600;
+            margin-left: 4px;
+        }
+
+        /* Admin Panel */
+        .panel { padding: 20px; overflow-y: auto; flex: 1; }
+        .panel h2 { color: #818cf8; margin-bottom: 16px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #1f2937; }
+        th { color: #6b7280; font-size: 0.75rem; text-transform: uppercase; }
+
+        .welcome-msg { text-align: center; margin-top: 15vh; color: #4b5563; }
+        .welcome-msg h2 { color: #818cf8; margin-bottom: 8px; }
+
+        .credentials-box {
+            background: #111827; border: 1px solid #1f2937; border-radius: 8px;
+            padding: 12px; margin-top: 16px; font-size: 0.75rem; color: #6b7280;
+        }
+        .credentials-box code { color: #818cf8; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<!-- Auth Page -->
+<div id="auth-page" class="auth-page">
+    <div class="auth-box">
+        <h1>Agentic RAG</h1>
+        <p class="sub">Project 3 — Authenticated Multi-Tool Search</p>
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('login')">Login</div>
+            <div class="tab" onclick="switchTab('register')">Register</div>
+        </div>
+        <form id="login-form" onsubmit="handleLogin(event)">
+            <div class="form-group"><label>Username</label><input type="text" id="l-user" required></div>
+            <div class="form-group"><label>Password</label><input type="password" id="l-pass" required></div>
+            <button type="submit" class="btn btn-full">Login</button>
+        </form>
+        <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
+            <div class="form-group"><label>Username</label><input type="text" id="r-user" required></div>
+            <div class="form-group"><label>Email</label><input type="email" id="r-email" required></div>
+            <div class="form-group"><label>Password</label><input type="password" id="r-pass" required></div>
+            <div class="form-group"><label>Department</label><input type="text" id="r-dept" value="general"></div>
+            <button type="submit" class="btn btn-full">Register</button>
+        </form>
+        <div id="auth-msg"></div>
+        <div class="credentials-box">
+            <strong>Demo accounts:</strong><br>
+            <code>admin</code> / <code>admin123</code> — super_admin (all tools)<br>
+            <code>manager</code> / <code>manager123</code> — admin (3 tools)<br>
+            <code>developer</code> / <code>dev123</code> — user (2 tools)<br>
+            <code>viewer</code> / <code>viewer123</code> — guest (1 tool)
+        </div>
+    </div>
+</div>
+
+<!-- Main App -->
+<div id="app-page" class="hidden">
+    <nav class="navbar">
+        <h1>Agentic RAG</h1>
+        <div class="right">
+            <span id="nav-user"></span>
+            <span id="nav-role" class="role-badge"></span>
+            <button class="btn btn-sm btn-danger" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+    <div class="layout">
+        <div class="sidebar">
+            <h3>Your Tools</h3>
+            <div id="tools-list"></div>
+            <div class="tab-list">
+                <button class="sidebar-tab active" onclick="showView('chat', this)">Chat</button>
+                <button class="sidebar-tab" onclick="showView('admin', this)" id="admin-tab" style="display:none">Admin Panel</button>
+                <button class="sidebar-tab" onclick="showView('audit', this)" id="audit-tab" style="display:none">Audit Log</button>
+            </div>
+        </div>
+        <div class="main">
+            <!-- Chat View -->
+            <div id="view-chat" class="main" style="display:flex; flex-direction:column; flex:1;">
+                <div class="chat-area" id="chat-area">
+                    <div class="welcome-msg">
+                        <h2>Ask anything</h2>
+                        <p>The agent will search your authorized knowledge bases and generate an answer.</p>
+                        <p style="margin-top:8px; font-size:0.8rem">Try: "What products do we offer?" or "What's on the Q2 roadmap?"</p>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Ask a question..." onkeydown="if(event.key==='Enter')sendChat()">
+                    <button class="btn" onclick="sendChat()">Send</button>
+                </div>
+            </div>
+            <!-- Admin View -->
+            <div id="view-admin" class="panel hidden">
+                <h2>User Management</h2>
+                <table><thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Dept</th><th>Active</th><th>Actions</th></tr></thead>
+                <tbody id="users-tbody"></tbody></table>
+            </div>
+            <!-- Audit View -->
+            <div id="view-audit" class="panel hidden">
+                <h2>Query Audit Log</h2>
+                <table><thead><tr><th>Time</th><th>User</th><th>Role</th><th>Query</th><th>Tools Used</th></tr></thead>
+                <tbody id="audit-tbody"></tbody></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const API = "http://localhost:8000/api";
+let tokens = { access: null, refresh: null };
+let currentUser = null;
+let conversationHistory = [];  // Multi-turn conversation memory
+
+function switchTab(tab) {
+    document.querySelectorAll('.auth-box .tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('auth-msg').innerHTML = '';
+    if (tab === 'login') {
+        document.querySelectorAll('.auth-box .tab')[0].classList.add('active');
+        document.getElementById('login-form').classList.remove('hidden');
+        document.getElementById('register-form').classList.add('hidden');
+    } else {
+        document.querySelectorAll('.auth-box .tab')[1].classList.add('active');
+        document.getElementById('login-form').classList.add('hidden');
+        document.getElementById('register-form').classList.remove('hidden');
+    }
+}
+
+function showMsg(id, text, type) {
+    document.getElementById(id).innerHTML = `<div class="msg msg-${type}">${text}</div>`;
+}
+
+async function apiFetch(url, opts = {}) {
+    if (tokens.access) opts.headers = { ...opts.headers, Authorization: `Bearer ${tokens.access}` };
+    let res = await fetch(url, opts);
+    if (res.status === 401 && tokens.refresh) {
+        const rr = await fetch(`${API}/refresh`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refresh_token: tokens.refresh }),
+        });
+        if (rr.ok) {
+            const d = await rr.json();
+            tokens.access = d.access_token; tokens.refresh = d.refresh_token;
+            opts.headers.Authorization = `Bearer ${tokens.access}`;
+            res = await fetch(url, opts);
+        } else { logout(); throw new Error("Session expired"); }
+    }
+    return res;
+}
+
+async function handleRegister(e) {
+    e.preventDefault();
+    try {
+        const res = await fetch(`${API}/register`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: document.getElementById("r-user").value,
+                email: document.getElementById("r-email").value,
+                password: document.getElementById("r-pass").value,
+                department: document.getElementById("r-dept").value,
+            }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail);
+        showMsg("auth-msg", "Registered! Please login.", "ok");
+        switchTab("login");
+    } catch (err) { showMsg("auth-msg", err.message, "err"); }
+}
+
+async function handleLogin(e) {
+    e.preventDefault();
+    try {
+        const res = await fetch(`${API}/login`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: document.getElementById("l-user").value,
+                password: document.getElementById("l-pass").value,
+            }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail);
+        tokens.access = data.access_token;
+        tokens.refresh = data.refresh_token;
+        await loadApp();
+    } catch (err) { showMsg("auth-msg", err.message, "err"); }
+}
+
+async function loadApp() {
+    const meRes = await apiFetch(`${API}/me`);
+    currentUser = await meRes.json();
+
+    document.getElementById("auth-page").classList.add("hidden");
+    document.getElementById("app-page").classList.remove("hidden");
+    document.getElementById("nav-user").textContent = currentUser.username;
+    const rb = document.getElementById("nav-role");
+    rb.textContent = currentUser.role; rb.className = `role-badge role-${currentUser.role}`;
+
+    await loadTools();
+
+    const roleLevel = { guest: 0, user: 1, admin: 2, super_admin: 3 };
+    if (roleLevel[currentUser.role] >= 2) {
+        document.getElementById("admin-tab").style.display = "block";
+        document.getElementById("audit-tab").style.display = "block";
+    }
+}
+
+async function loadTools() {
+    const res = await apiFetch(`${API}/tools`);
+    const data = await res.json();
+    const container = document.getElementById("tools-list");
+    container.innerHTML = data.tools.map(t => `
+        <div class="tool-card ${t.accessible ? 'unlocked' : 'locked'}">
+            <div class="name">${t.accessible ? '&#9679;' : '&#9675;'} ${t.name}</div>
+            <div class="access">${t.accessible ? 'Accessible' : `Requires: ${t.required_role}`}</div>
+        </div>
+    `).join('');
+}
+
+function showView(view, el) {
+    document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('view-chat').classList.add('hidden');
+    document.getElementById('view-admin').classList.add('hidden');
+    document.getElementById('view-audit').classList.add('hidden');
+    document.getElementById(`view-${view}`).classList.remove('hidden');
+    document.getElementById(`view-${view}`).style.display = view === 'chat' ? 'flex' : 'block';
+
+    if (view === 'admin') loadUsers();
+    if (view === 'audit') loadAudit();
+}
+
+async function sendChat() {
+    const input = document.getElementById("chat-input");
+    const message = input.value.trim();
+    if (!message) return;
+    input.value = "";
+
+    const chatArea = document.getElementById("chat-area");
+    const welcome = chatArea.querySelector('.welcome-msg');
+    if (welcome) welcome.remove();
+
+    // Add to conversation history
+    conversationHistory.push({ role: "user", content: message });
+
+    // User bubble
+    chatArea.innerHTML += `<div class="message-bubble user"><div class="bubble">${escapeHtml(message)}</div></div>`;
+
+    // Loading bubble with ReAct animation
+    const loadingId = 'loading-' + Date.now();
+    chatArea.innerHTML += `<div class="message-bubble bot" id="${loadingId}"><div class="bubble" style="color:#6b7280">Thinking...</div></div>`;
+    chatArea.scrollTop = chatArea.scrollHeight;
+
+    try {
+        const res = await apiFetch(`${API}/chat`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                message,
+                conversation_history: conversationHistory.slice(-6),
+            }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Chat failed");
+
+        // Add assistant response to conversation history
+        conversationHistory.push({ role: "assistant", content: data.answer });
+
+        const sourcesId = 'src-' + Date.now();
+        const traceId = 'trace-' + Date.now();
+        const steps = data.reasoning_steps || [];
+        const loadingEl = document.getElementById(loadingId);
+
+        loadingEl.innerHTML = `
+            <div class="bubble">${escapeHtml(data.answer).replace(/\n/g, '<br>')}</div>
+            <div class="tools-used">
+                ${data.tools_used.map(t => `<span class="tool-tag">${t}</span>`).join('')}
+                <span class="step-count-badge">${steps.length} steps</span>
+            </div>
+            ${steps.length ? `
+                <span class="reasoning-toggle" onclick="toggleTrace('${traceId}', this)">
+                    ReAct trace
+                </span>
+                <div class="reasoning-trace" id="${traceId}">
+                    ${steps.map(s => renderStep(s)).join('')}
+                </div>
+            ` : ''}
+            ${data.sources.length ? `
+                <span class="sources-toggle" onclick="document.getElementById('${sourcesId}').classList.toggle('open')" style="margin-left:12px">
+                    ${data.sources.length} sources
+                </span>
+                <div class="sources-list" id="${sourcesId}">
+                    ${data.sources.map(s => `<div style="margin-bottom:4px"><strong>${s.source}</strong> [${s.access_level}] via <span class="step-tool-name">${s.tool}</span> — ${escapeHtml(s.content).substring(0, 100)}...</div>`).join('')}
+                </div>
+            ` : ''}
+        `;
+    } catch (err) {
+        document.getElementById(loadingId).innerHTML = `<div class="bubble" style="color:#fca5a5">Error: ${err.message}</div>`;
+    }
+    chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function renderStep(step) {
+    const type = step.type || 'thought';
+    const toolBadge = step.tool ? `<span class="step-tool-name">${step.tool}</span>` : '';
+    const countBadge = step.result_count != null ? ` (${step.result_count} results)` : '';
+    return `
+        <div class="react-step step-${type}">
+            <div class="step-label">Step ${step.step}: ${type} ${toolBadge}${countBadge}</div>
+            <div class="step-content">${escapeHtml(step.content || '')}</div>
+        </div>
+    `;
+}
+
+function toggleTrace(id, el) {
+    const trace = document.getElementById(id);
+    trace.classList.toggle('open');
+    el.classList.toggle('open');
+}
+
+async function loadUsers() {
+    const res = await apiFetch(`${API}/users`);
+    if (!res.ok) return;
+    const users = await res.json();
+    document.getElementById("users-tbody").innerHTML = users.map(u => `
+        <tr>
+            <td>${u.id}</td><td>${u.username}</td><td>${u.email}</td>
+            <td><span class="role-badge role-${u.role}" style="font-size:0.65rem">${u.role}</span></td>
+            <td>${u.department || '-'}</td><td>${u.is_active ? 'Yes' : 'No'}</td>
+            <td>${currentUser.role === 'super_admin' ? `
+                <select onchange="updateRole(${u.id}, this.value)" style="padding:3px;background:#111827;color:#e2e8f0;border:1px solid #1f2937;border-radius:4px;font-size:0.75rem">
+                    ${['guest','user','admin','super_admin'].map(r => `<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('')}
+                </select>
+            ` : '-'}</td>
+        </tr>
+    `).join('');
+}
+
+async function updateRole(userId, newRole) {
+    await apiFetch(`${API}/users/${userId}/role`, {
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: newRole }),
+    });
+    await loadUsers();
+}
+
+async function loadAudit() {
+    const res = await apiFetch(`${API}/audit-log`);
+    if (!res.ok) return;
+    const logs = await res.json();
+    document.getElementById("audit-tbody").innerHTML = logs.map(l => `
+        <tr>
+            <td style="white-space:nowrap">${l.timestamp || '-'}</td>
+            <td>${l.username}</td>
+            <td><span class="role-badge role-${l.role}" style="font-size:0.6rem">${l.role}</span></td>
+            <td>${escapeHtml(l.query).substring(0, 80)}</td>
+            <td>${(l.tools_used || '').split(',').map(t => `<span class="tool-tag">${t}</span>`).join(' ')}</td>
+        </tr>
+    `).join('');
+}
+
+function escapeHtml(text) {
+    const d = document.createElement('div');
+    d.textContent = text;
+    return d.innerHTML;
+}
+
+function logout() {
+    tokens = { access: null, refresh: null };
+    currentUser = null;
+    conversationHistory = [];
+    document.getElementById("auth-page").classList.remove("hidden");
+    document.getElementById("app-page").classList.add("hidden");
+    document.getElementById("chat-area").innerHTML = `
+        <div class="welcome-msg"><h2>Ask anything</h2>
+        <p>The agent will search your authorized knowledge bases and generate an answer.</p></div>`;
+}
+</script>
+</body>
+</html>
