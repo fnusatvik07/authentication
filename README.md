@@ -1,9 +1,9 @@
 <h1 align="center">Auth Masterclass</h1>
 
 <p align="center">
-  <strong>The only authentication course you'll ever need.</strong>
+  <strong>Authenticate Everything. APIs. Agents. RAG.</strong>
   <br/>
-  Password hashing to agentic RAG. 15 chapters. 3 projects. 191 tests.
+  Learn how to secure APIs, protect RAG pipelines, and build AI agents with role-gated tools.
 </p>
 
 <p align="center">

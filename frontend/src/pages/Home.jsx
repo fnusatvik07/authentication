@@ -33,10 +33,10 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.6 }}
           >
-            The Only Auth Course
+            Authenticate Everything.
             <br />
             <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              You'll Ever Need.
+              APIs. Agents. RAG.
             </span>
           </motion.h1>
 
@@ -46,8 +46,8 @@ export default function Home() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            Password hashing, JWT, RS256, RBAC, token blacklisting, and a ReAct RAG agent
-            with role-gated tools. 15 chapters. 3 projects. 191 tests. Zero hand-waving.
+            Learn how to secure APIs, protect RAG pipelines, and build AI agents
+            with role-gated tools. From bcrypt to ReAct. Everything tested.
           </motion.p>
 
           <motion.div
